@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Bio Generator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+        }
+        /* Custom scrollbar for results */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 min-h-screen flex items-center justify-center p-4">
+
+    <div class="max-w-2xl w-full glass-panel rounded-3xl shadow-xl overflow-hidden flex flex-col md:flex-row h-[900px] md:h-[750px]">
+        
+        <!-- Left Side: Input -->
+        <div class="w-full md:w-1/2 p-8 bg-white/60 flex flex-col border-r border-white/50 overflow-y-auto">
+            <div class="mb-8">
+                <h1 class="text-3xl font-bold text-gray-800 flex items-center gap-2">
+                    <i class="fa-solid fa-wand-magic-sparkles text-purple-600"></i> BioGen AI
+                </h1>
+                <p class="text-sm text-gray-500 mt-2">Generate the perfect social media bio in seconds.</p>
+            </div>
+
+            <div class="space-y-5">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Keywords about you</label>
+                    <input type="text" id="keywords" placeholder="e.g. Developer, Coffee Addict, NYC" class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-purple-500 focus:ring-2 focus:ring-purple-200 transition outline-none bg-white/80">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Current Profile Link (Optional)</label>
+                    <input type="url" id="profileUrl" placeholder="https://twitter.com/yourhandle" class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-purple-500 focus:ring-2 focus:ring-purple-200 transition outline-none bg-white/80">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">More about you (Optional)</label>
+                    <textarea id="description" rows="2" placeholder="Share your vibe, goals, or what you're building..." class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-purple-500 focus:ring-2 focus:ring-purple-200 transition outline-none bg-white/80 resize-none"></textarea>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Platform</label>
+                    <select id="platform" class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-purple-500 focus:ring-2 focus:ring-purple-200 transition outline-none bg-white/80 appearance-none">
+                        <option value="Twitter/X">Twitter / X</option>
+                        <option value="Instagram">Instagram</option>
+                        <option value="LinkedIn">LinkedIn</option>
+                        <option value="Tinder">Tinder / Dating</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Tone</label>
+                    <div class="grid grid-cols-3 gap-2">
+                        <label class="cursor-pointer">
+                            <input type="radio" name="tone" value="Professional" class="peer sr-only" checked>
+                            <div class="text-center px-2 py-2 rounded-lg border border-gray-200 peer-checked:bg-purple-100 peer-checked:border-purple-500 peer-checked:text-purple-700 text-sm transition">Pro</div>
+                        </label>
+                        <label class="cursor-pointer">
+                            <input type="radio" name="tone" value="Funny" class="peer sr-only">
+                            <div class="text-center px-2 py-2 rounded-lg border border-gray-200 peer-checked:bg-purple-100 peer-checked:border-purple-500 peer-checked:text-purple-700 text-sm transition">Funny</div>
+                        </label>
+                        <label class="cursor-pointer">
+                            <input type="radio" name="tone" value="Mysterious" class="peer sr-only">
+                            <div class="text-center px-2 py-2 rounded-lg border border-gray-200 peer-checked:bg-purple-100 peer-checked:border-purple-500 peer-checked:text-purple-700 text-sm transition">Edgy</div>
+                        </label>
+                    </div>
+                </div>
+
+                <button id="generateBtn" class="w-full bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-bold py-3 px-4 rounded-xl shadow-lg hover:shadow-xl hover:opacity-90 transition transform active:scale-95 flex justify-center items-center gap-2 mt-4">
+                    <span>Generate Bios</span>
+                    <i class="fa-solid fa-bolt"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Right Side: Output -->
+        <div class="w-full md:w-1/2 p-8 bg-gray-50/50 flex flex-col relative">
+            <h2 class="text-lg font-semibold text-gray-800 mb-4 border-b border-gray-200 pb-2">Your Results</h2>
+            
+            <div id="resultsContainer" class="flex-1 overflow-y-auto space-y-4 pr-2">
+                <!-- Empty State -->
+                <div id="emptyState" class="h-full flex flex-col items-center justify-center text-gray-400">
+                    <i class="fa-regular fa-id-badge text-5xl mb-3 opacity-50"></i>
+                    <p class="text-sm text-center">Fill out the form and hit generate to see your bios here.</p>
+                </div>
+
+                <!-- Loading State (Hidden by default) -->
+                <div id="loadingState" class="hidden h-full flex flex-col items-center justify-center text-purple-600">
+                    <i class="fa-solid fa-circle-notch fa-spin text-4xl mb-3"></i>
+                    <p class="text-sm font-medium animate-pulse">Crafting AI magic...</p>
+                </div>
+
+                <!-- Results will be injected here -->
+            </div>
+
+            <!-- Toast Notification -->
+            <div id="toast" class="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white px-4 py-2 rounded-lg text-sm shadow-lg transition-opacity duration-300 opacity-0 pointer-events-none">
+                Copied to clipboard!
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- Configuration ---
+        // In a real production app, the API key should be handled securely on a backend.
+        const apiKey = ""; 
+        const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
+
+        // --- UI Elements ---
+        const generateBtn = document.getElementById('generateBtn');
+        const keywordsInput = document.getElementById('keywords');
+        const profileUrlInput = document.getElementById('profileUrl');
+        const descriptionInput = document.getElementById('description');
+        const platformSelect = document.getElementById('platform');
+        const resultsContainer = document.getElementById('resultsContainer');
+        const emptyState = document.getElementById('emptyState');
+        const loadingState = document.getElementById('loadingState');
+        const toast = document.getElementById('toast');
+
+        // --- Helper: Exponential Backoff Fetch ---
+        async function fetchWithRetry(url, options, retries = 5) {
+            const delays = [1000, 2000, 4000, 8000, 16000];
+            for (let i = 0; i < retries; i++) {
+                try {
+                    const response = await fetch(url, options);
+                    if (!response.ok) {
+                        const errorData = await response.json().catch(() => ({}));
+                        throw new Error(`API Error ${response.status}: ${errorData.error?.message || 'Unknown error'}`);
+                    }
+                    return await response.json();
+                } catch (error) {
+                    if (i === retries - 1) throw error; // Throw on final attempt
+                    console.warn(`Attempt ${i + 1} failed. Retrying in ${delays[i]}ms...`, error);
+                    await new Promise(resolve => setTimeout(resolve, delays[i]));
+                }
+            }
+        }
+
+        // --- Logic: Call Gemini API ---
+        async function generateBios() {
+            const keywords = keywordsInput.value.trim();
+            const profileUrl = profileUrlInput.value.trim();
+            const description = descriptionInput.value.trim();
+            const platform = platformSelect.value;
+            const tone = document.querySelector('input[name="tone"]:checked').value;
+
+            if (!keywords && !description) {
+                showToast("Please enter some keywords or a description!");
+                keywordsInput.focus();
+                return;
+            }
+
+            // Update UI to Loading
+            emptyState.classList.add('hidden');
+            Array.from(resultsContainer.querySelectorAll('.bio-card')).forEach(el => el.remove()); // Clear old results
+            loadingState.classList.remove('hidden');
+            loadingState.classList.add('flex');
+            generateBtn.disabled = true;
+            generateBtn.classList.add('opacity-50', 'cursor-not-allowed');
+
+            const systemPrompt = `You are an expert social media copywriter. Generate EXACTLY 3 unique bio options based on the user's input. 
+            Format the output strictly as a JSON array of strings. Do not include markdown code blocks, just the JSON array.
+            Rules for bios:
+            - Platform: ${platform} (adhere to typical length and style limits for this platform)
+            - Tone: ${tone}
+            - Include emojis if appropriate for the tone/platform.
+            - If a profile link is provided, use the context of that link to inform the style and content of the bio.`;
+
+            const userQuery = `Keywords: ${keywords || 'None provided'}
+            Additional Description: ${description || 'None provided'}
+            Current Profile Link: ${profileUrl || 'None provided'}`;
+
+            const payload = {
+                contents: [{ parts: [{ text: userQuery }] }],
+                systemInstruction: { parts: [{ text: systemPrompt }] },
+                generationConfig: {
+                    responseMimeType: "application/json",
+                    responseSchema: {
+                        type: "ARRAY",
+                        items: { type: "STRING" }
+                    }
+                }
+            };
+
+            try {
+                const data = await fetchWithRetry(API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                const rawText = data.candidates?.[0]?.content?.parts?.[0]?.text;
+                
+                if (!rawText) throw new Error("No text returned from API");
+
+                let bios = [];
+                try {
+                    bios = JSON.parse(rawText);
+                } catch (e) {
+                    throw new Error("Failed to parse API response as JSON");
+                }
+
+                renderBios(bios);
+
+            } catch (error) {
+                console.error("Generation Error:", error);
+                showToast("Error generating bios. Please try again.");
+                emptyState.classList.remove('hidden');
+                emptyState.querySelector('p').innerText = "An error occurred. Please check console or try again.";
+            } finally {
+                // Reset UI
+                loadingState.classList.add('hidden');
+                loadingState.classList.remove('flex');
+                generateBtn.disabled = false;
+                generateBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+            }
+        }
+
+        // --- UI: Render Results ---
+        function renderBios(biosArray) {
+            if (!Array.isArray(biosArray) || biosArray.length === 0) {
+                showToast("No bios generated. Try changing keywords.");
+                emptyState.classList.remove('hidden');
+                return;
+            }
+
+            biosArray.forEach((bio, index) => {
+                const card = document.createElement('div');
+                card.className = "bio-card bg-white p-4 rounded-xl border border-gray-100 shadow-sm relative group hover:border-purple-200 transition";
+                
+                const textPara = document.createElement('p');
+                textPara.className = "text-gray-700 text-sm whitespace-pre-wrap pr-8";
+                textPara.textContent = bio;
+
+                const copyBtn = document.createElement('button');
+                copyBtn.className = "absolute top-3 right-3 text-gray-400 hover:text-purple-600 transition p-2 rounded-lg hover:bg-purple-50 opacity-0 group-hover:opacity-100 focus:opacity-100";
+                copyBtn.innerHTML = '<i class="fa-regular fa-copy"></i>';
+                copyBtn.title = "Copy to clipboard";
+                copyBtn.onclick = () => copyToClipboard(bio);
+
+                card.appendChild(textPara);
+                card.appendChild(copyBtn);
+                resultsContainer.appendChild(card);
+            });
+        }
+
+        // --- Helper: Copy & Toast ---
+        function copyToClipboard(text) {
+            // Using older execCommand as fallback for iframes where clipboard API might be restricted
+            const textArea = document.createElement("textarea");
+            textArea.value = text;
+            textArea.style.position = "fixed";
+            textArea.style.left = "-999999px";
+            textArea.style.top = "-999999px";
+            document.body.appendChild(textArea);
+            textArea.focus();
+            textArea.select();
+            
+            try {
+                document.execCommand('copy');
+                showToast("Copied to clipboard!");
+            } catch (err) {
+                console.error('Fallback: Oops, unable to copy', err);
+            }
+            
+            document.body.removeChild(textArea);
+        }
+
+        function showToast(msg) {
+            toast.textContent = msg;
+            toast.classList.remove('opacity-0');
+            setTimeout(() => {
+                toast.classList.add('opacity-0');
+            }, 2500);
+        }
+
+        // --- Event Listeners ---
+        generateBtn.addEventListener('click', generateBios);
+        
+        // Allow pressing Enter in the input to generate
+        keywordsInput.addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+                generateBios();
+            }
+        });
+    </script>
+</body>
+</html>
