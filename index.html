@@ -138,10 +138,7 @@
 
     <script>
         // --- Configuration ---
-        const apiKey = "AIzaSyCKOSti5pk5M-Fsz8Yd3Y_tzX1ObW_ueyA"; 
-        
-        // ✨ FIXED: Updated to the stable public model version ✨
-        const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
+        const API_URL = `/.netlify/functions/generate`;
 
         // --- Custom Dropdown Logic ---
         const platformSelectBtn = document.getElementById('platformSelectBtn');
