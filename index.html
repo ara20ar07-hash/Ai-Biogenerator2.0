@@ -4,6 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AI Bio Generator</title>
+    <!-- Google Analytics (Remember to swap G-YOURID for your real ID later if you want tracking!) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-YOURID"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-YOURID');
+    </script>
+    <meta name="description" content="Generate the perfect AI bio for Twitter, Instagram, and LinkedIn.">
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet">
     <style>
@@ -138,6 +147,7 @@
 
     <script>
         // --- Configuration ---
+        // ✨ SECURE URL - Pointing strictly to your Netlify server (No API keys exposed!)
         const API_URL = `/.netlify/functions/generate`;
 
         // --- Custom Dropdown Logic ---
@@ -181,26 +191,7 @@
         const loadingState = document.getElementById('loadingState');
         const toast = document.getElementById('toast');
 
-        // --- Helper: Exponential Backoff Fetch ---
-        async function fetchWithRetry(url, options, retries = 5) {
-            const delays = [1000, 2000, 4000, 8000, 16000];
-            for (let i = 0; i < retries; i++) {
-                try {
-                    const response = await fetch(url, options);
-                    if (!response.ok) {
-                        const errorData = await response.json().catch(() => ({}));
-                        throw new Error(`API Error ${response.status}: ${errorData.error?.message || 'Unknown error'}`);
-                    }
-                    return await response.json();
-                } catch (error) {
-                    if (i === retries - 1) throw error; 
-                    console.warn(`Attempt ${i + 1} failed. Retrying in ${delays[i]}ms...`, error);
-                    await new Promise(resolve => setTimeout(resolve, delays[i]));
-                }
-            }
-        }
-
-        // --- Logic: Call Gemini API ---
+        // --- Logic: Call Your Netlify Backend ---
         async function generateBios() {
             const keywords = keywordsInput.value.trim();
             const profileUrl = profileUrlInput.value.trim();
@@ -247,12 +238,17 @@
             };
 
             try {
-                const data = await fetchWithRetry(API_URL, {
+                const response = await fetch(API_URL, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(payload)
                 });
 
+                if (!response.ok) {
+                    throw new Error(`Server returned ${response.status}`);
+                }
+
+                const data = await response.json();
                 const rawText = data.candidates?.[0]?.content?.parts?.[0]?.text;
                 
                 if (!rawText) throw new Error("No text returned from API");
@@ -270,7 +266,7 @@
                 console.error("Generation Error:", error);
                 showToast("Error generating bios. Please try again.");
                 emptyState.classList.remove('hidden');
-                emptyState.querySelector('p').innerText = "An error occurred. Please try again.";
+                emptyState.querySelector('p').innerText = "An error occurred connecting to the server.";
             } finally {
                 // Reset UI
                 loadingState.classList.add('hidden');
