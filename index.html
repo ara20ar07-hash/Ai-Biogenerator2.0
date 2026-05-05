@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="light">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -13,124 +13,163 @@
       gtag('config', 'G-024D3RJ6JT');
     </script>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class', // Enable class-based dark mode
+        }
+    </script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet">
     <style>
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+        
+        /* Light Mode Glass */
         .glass-panel {
             background: rgba(255, 255, 255, 0.7);
             backdrop-filter: blur(12px);
             border: 1px solid rgba(255, 255, 255, 0.5);
         }
+        
+        /* Dark Mode Glass */
+        .dark .glass-panel {
+            background: rgba(30, 41, 59, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
         /* Custom scrollbar */
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
         ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        .dark ::-webkit-scrollbar-thumb { background: #475569; }
+        .dark ::-webkit-scrollbar-thumb:hover { background: #64748b; }
         
+        /* Active Nav Item */
         .nav-item.active {
             background: linear-gradient(to right, #f3e8ff, #e0e7ff);
             border-right: 4px solid #7c3aed;
             color: #6d28d9;
             font-weight: 600;
         }
+        .dark .nav-item.active {
+            background: linear-gradient(to right, rgba(124, 58, 237, 0.2), rgba(79, 70, 229, 0.1));
+            color: #a78bfa;
+        }
     </style>
 </head>
-<body class="bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 h-screen flex overflow-hidden">
+<body class="bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 dark:from-gray-900 dark:via-slate-900 dark:to-gray-900 h-screen flex overflow-hidden transition-colors duration-300">
 
-    <!-- Mobile Header (Visible only on small screens) -->
+    <!-- Mobile Header -->
     <div class="md:hidden fixed top-0 w-full glass-panel z-50 p-4 flex justify-between items-center shadow-sm">
-        <h1 class="text-xl font-bold text-gray-800 flex items-center gap-2">
-            <i class="fa-solid fa-bolt text-purple-600"></i> CreatorAI
+        <h1 class="text-xl font-bold text-gray-800 dark:text-white flex items-center gap-2">
+            <i class="fa-solid fa-bolt text-purple-600 dark:text-purple-400"></i> CreatorAI
         </h1>
-        <button id="mobileMenuBtn" class="text-gray-600 text-2xl"><i class="fa-solid fa-bars"></i></button>
+        <div class="flex items-center gap-4">
+            <button onclick="toggleTheme()" class="text-gray-600 dark:text-gray-300 text-xl"><i id="mobileThemeIcon" class="fa-solid fa-moon"></i></button>
+            <button id="mobileMenuBtn" class="text-gray-600 dark:text-gray-300 text-2xl"><i class="fa-solid fa-bars"></i></button>
+        </div>
     </div>
 
     <!-- Sidebar Navigation -->
-    <div id="sidebar" class="w-64 glass-panel border-r border-white/50 flex-shrink-0 flex flex-col absolute md:relative z-40 h-full transform -translate-x-full md:translate-x-0 transition-transform duration-300">
-        <div class="p-6 hidden md:block border-b border-gray-200/50">
-            <h1 class="text-2xl font-bold text-gray-800 flex items-center gap-2">
-                <i class="fa-solid fa-layer-group text-purple-600"></i> CreatorAI
+    <div id="sidebar" class="w-64 glass-panel border-r border-white/50 dark:border-gray-700/50 flex-shrink-0 flex flex-col absolute md:relative z-40 h-full transform -translate-x-full md:translate-x-0 transition-transform duration-300">
+        <div class="p-6 hidden md:block border-b border-gray-200/50 dark:border-gray-700/50">
+            <h1 class="text-2xl font-bold text-gray-800 dark:text-white flex items-center gap-2">
+                <i class="fa-solid fa-layer-group text-purple-600 dark:text-purple-400"></i> CreatorAI
             </h1>
         </div>
         
-        <div class="flex-1 overflow-y-auto py-4">
-            <p class="px-6 text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Tools</p>
-            <nav class="space-y-1">
-                <a href="#" onclick="switchTool('bio', event)" class="nav-item active flex items-center gap-3 px-6 py-3 text-gray-600 hover:bg-white/50 transition">
-                    <i class="fa-regular fa-id-badge w-5 text-center"></i> Bio Generator
-                </a>
-                <a href="#" onclick="switchTool('caption', event)" class="nav-item flex items-center gap-3 px-6 py-3 text-gray-600 hover:bg-white/50 transition">
-                    <i class="fa-solid fa-pen-nib w-5 text-center"></i> Viral Captions
-                </a>
-                <a href="#" onclick="switchTool('hook', event)" class="nav-item flex items-center gap-3 px-6 py-3 text-gray-600 hover:bg-white/50 transition">
-                    <i class="fa-solid fa-magnet w-5 text-center"></i> Video Hooks
-                </a>
-                <a href="#" onclick="switchTool('roast', event)" class="nav-item flex items-center gap-3 px-6 py-3 text-gray-600 hover:bg-white/50 transition">
-                    <i class="fa-solid fa-fire text-orange-500 w-5 text-center"></i> Roast My Profile
-                </a>
-            </nav>
-        </div>
-        
-        <div class="p-4 border-t border-gray-200/50 text-center text-xs text-gray-500">
-            Powered by Gemini AI
+        <div class="flex-1 overflow-y-auto py-4 flex flex-col justify-between">
+            <div>
+                <p class="px-6 text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-2">Tools</p>
+                <nav class="space-y-1">
+                    <a href="#" onclick="switchTool('bio', event)" class="nav-item active flex items-center gap-3 px-6 py-3 text-gray-600 dark:text-gray-300 hover:bg-white/50 dark:hover:bg-gray-800/50 transition">
+                        <i class="fa-regular fa-id-badge w-5 text-center"></i> Bio Generator
+                    </a>
+                    <a href="#" onclick="switchTool('caption', event)" class="nav-item flex items-center gap-3 px-6 py-3 text-gray-600 dark:text-gray-300 hover:bg-white/50 dark:hover:bg-gray-800/50 transition">
+                        <i class="fa-solid fa-pen-nib w-5 text-center"></i> Viral Captions
+                    </a>
+                    <a href="#" onclick="switchTool('hook', event)" class="nav-item flex items-center gap-3 px-6 py-3 text-gray-600 dark:text-gray-300 hover:bg-white/50 dark:hover:bg-gray-800/50 transition">
+                        <i class="fa-solid fa-magnet w-5 text-center"></i> Video Hooks
+                    </a>
+                    <a href="#" onclick="switchTool('roast', event)" class="nav-item flex items-center gap-3 px-6 py-3 text-gray-600 dark:text-gray-300 hover:bg-white/50 dark:hover:bg-gray-800/50 transition">
+                        <i class="fa-solid fa-fire text-orange-500 w-5 text-center"></i> Roast My Profile
+                    </a>
+                </nav>
+
+                <p class="px-6 text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider mt-8 mb-2">Account</p>
+                <nav class="space-y-1">
+                    <a href="#" onclick="switchTool('history', event)" class="nav-item flex items-center gap-3 px-6 py-3 text-gray-600 dark:text-gray-300 hover:bg-white/50 dark:hover:bg-gray-800/50 transition">
+                        <i class="fa-solid fa-clock-rotate-left w-5 text-center"></i> My History
+                    </a>
+                    <button onclick="toggleTheme()" class="w-full flex items-center gap-3 px-6 py-3 text-gray-600 dark:text-gray-300 hover:bg-white/50 dark:hover:bg-gray-800/50 transition text-left">
+                        <i id="desktopThemeIcon" class="fa-solid fa-moon w-5 text-center"></i> Dark Mode
+                    </button>
+                </nav>
+            </div>
+            
+            <div class="px-6 py-4 mt-auto border-t border-gray-200/50 dark:border-gray-700/50">
+                <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 rounded-full bg-gradient-to-r from-purple-500 to-indigo-500 flex items-center justify-center text-white font-bold text-sm">
+                        <i class="fa-solid fa-user"></i>
+                    </div>
+                    <div>
+                        <p class="text-sm font-semibold text-gray-800 dark:text-gray-200" id="userAccountName">Connecting...</p>
+                        <p class="text-xs text-green-500 font-medium flex items-center gap-1"><i class="fa-solid fa-circle text-[8px]"></i> Online</p>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
     <!-- Main Content Area -->
     <div class="flex-1 flex flex-col h-full overflow-hidden pt-16 md:pt-0 relative">
-        <!-- Close overlay for mobile -->
-        <div id="overlay" class="hidden absolute inset-0 bg-gray-900/20 z-30 md:hidden backdrop-blur-sm"></div>
+        <div id="overlay" class="hidden absolute inset-0 bg-gray-900/40 z-30 md:hidden backdrop-blur-sm"></div>
 
         <div class="flex-1 overflow-y-auto p-4 md:p-8">
             <div class="max-w-5xl mx-auto glass-panel rounded-3xl shadow-xl overflow-hidden flex flex-col lg:flex-row min-h-[700px]">
                 
-                <!-- Left Side: Dynamic Input Form -->
-                <div class="w-full lg:w-1/2 p-6 md:p-8 bg-white/60 flex flex-col border-r border-white/50">
+                <!-- Left Side: Dynamic Input Form (Hidden on History Tab) -->
+                <div id="inputSection" class="w-full lg:w-1/2 p-6 md:p-8 bg-white/60 dark:bg-gray-800/40 flex flex-col border-r border-white/50 dark:border-gray-700/50 transition-colors">
                     <div class="mb-8">
-                        <h2 id="toolTitle" class="text-3xl font-bold text-gray-800 flex items-center gap-2">
-                            <i id="toolIcon" class="fa-regular fa-id-badge text-purple-600"></i> 
+                        <h2 id="toolTitle" class="text-3xl font-bold text-gray-800 dark:text-white flex items-center gap-2">
+                            <i id="toolIcon" class="fa-regular fa-id-badge text-purple-600 dark:text-purple-400"></i> 
                             <span id="toolTitleText">Bio Generator</span>
                         </h2>
-                        <p id="toolDesc" class="text-sm text-gray-500 mt-2">Generate the perfect social media bio in seconds.</p>
+                        <p id="toolDesc" class="text-sm text-gray-500 dark:text-gray-400 mt-2">Generate the perfect social media bio in seconds.</p>
                     </div>
 
                     <div class="space-y-5 flex-1">
                         <!-- Main Text Input -->
                         <div>
-                            <label id="mainInputLabel" class="block text-sm font-medium text-gray-700 mb-1">Keywords about you</label>
-                            <textarea id="mainInput" rows="3" placeholder="e.g. Developer, Coffee Addict, NYC" class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-purple-500 focus:ring-2 focus:ring-purple-200 transition outline-none bg-white/80 resize-none"></textarea>
+                            <label id="mainInputLabel" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Keywords about you</label>
+                            <textarea id="mainInput" rows="3" placeholder="e.g. Developer, Coffee Addict, NYC" class="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-600 focus:border-purple-500 focus:ring-2 focus:ring-purple-200 dark:focus:ring-purple-900 transition outline-none bg-white/80 dark:bg-gray-700/80 dark:text-white resize-none"></textarea>
                         </div>
 
-                        <!-- Options Section (Toggles based on tool) -->
+                        <!-- Options Section -->
                         <div id="optionsSection" class="space-y-5">
                             <!-- Platform Dropdown -->
                             <div id="platformContainer">
-                                <label class="block text-sm font-medium text-gray-700 mb-1">Platform</label>
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Platform</label>
                                 <div class="relative">
-                                    <!-- The clickable button -->
-                                    <div id="platformSelectBtn" class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-purple-500 focus:ring-2 focus:ring-purple-200 transition outline-none bg-white/80 cursor-pointer flex items-center justify-between shadow-sm">
-                                        <div id="selectedPlatformDisplay" class="flex items-center gap-3 font-medium text-gray-700">
+                                    <div id="platformSelectBtn" class="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-600 focus:border-purple-500 focus:ring-2 focus:ring-purple-200 dark:focus:ring-purple-900 transition outline-none bg-white/80 dark:bg-gray-700/80 dark:text-white cursor-pointer flex items-center justify-between shadow-sm">
+                                        <div id="selectedPlatformDisplay" class="flex items-center gap-3 font-medium text-gray-700 dark:text-gray-200">
                                             <i class="fa-brands fa-instagram text-pink-600 text-lg w-5 text-center"></i> Instagram
                                         </div>
                                         <i class="fa-solid fa-chevron-down text-gray-400 text-sm"></i>
                                     </div>
                                     
                                     <!-- The hidden menu -->
-                                    <div id="platformDropdownMenu" class="hidden absolute z-20 w-full mt-2 bg-white rounded-xl shadow-xl border border-gray-100 overflow-hidden">
-                                        <div class="platform-option p-3 hover:bg-purple-50 cursor-pointer flex items-center gap-3 transition font-medium text-gray-700" data-value="Instagram">
+                                    <div id="platformDropdownMenu" class="hidden absolute z-20 w-full mt-2 bg-white dark:bg-gray-800 rounded-xl shadow-xl border border-gray-100 dark:border-gray-700 overflow-hidden">
+                                        <div class="platform-option p-3 hover:bg-purple-50 dark:hover:bg-gray-700 cursor-pointer flex items-center gap-3 transition font-medium text-gray-700 dark:text-gray-200" data-value="Instagram">
                                             <i class="fa-brands fa-instagram text-pink-600 text-lg w-5 text-center"></i> Instagram
                                         </div>
-                                        <div class="platform-option p-3 hover:bg-purple-50 cursor-pointer flex items-center gap-3 transition font-medium text-gray-700" data-value="Twitter/X">
-                                            <i class="fa-brands fa-x-twitter text-gray-800 text-lg w-5 text-center"></i> Twitter / X
+                                        <div class="platform-option p-3 hover:bg-purple-50 dark:hover:bg-gray-700 cursor-pointer flex items-center gap-3 transition font-medium text-gray-700 dark:text-gray-200" data-value="Twitter/X">
+                                            <i class="fa-brands fa-x-twitter text-gray-800 dark:text-white text-lg w-5 text-center"></i> Twitter / X
                                         </div>
-                                        <div class="platform-option p-3 hover:bg-purple-50 cursor-pointer flex items-center gap-3 transition font-medium text-gray-700" data-value="TikTok">
-                                            <i class="fa-brands fa-tiktok text-black text-lg w-5 text-center"></i> TikTok
+                                        <div class="platform-option p-3 hover:bg-purple-50 dark:hover:bg-gray-700 cursor-pointer flex items-center gap-3 transition font-medium text-gray-700 dark:text-gray-200" data-value="TikTok">
+                                            <i class="fa-brands fa-tiktok text-black dark:text-white text-lg w-5 text-center"></i> TikTok
                                         </div>
-                                        <div class="platform-option p-3 hover:bg-purple-50 cursor-pointer flex items-center gap-3 transition font-medium text-gray-700" data-value="LinkedIn">
+                                        <div class="platform-option p-3 hover:bg-purple-50 dark:hover:bg-gray-700 cursor-pointer flex items-center gap-3 transition font-medium text-gray-700 dark:text-gray-200" data-value="LinkedIn">
                                             <i class="fa-brands fa-linkedin text-blue-600 text-lg w-5 text-center"></i> LinkedIn
-                                        </div>
-                                        <div class="platform-option p-3 hover:bg-purple-50 cursor-pointer flex items-center gap-3 transition font-medium text-gray-700" data-value="Facebook">
-                                            <i class="fa-brands fa-facebook text-blue-800 text-lg w-5 text-center"></i> Facebook
                                         </div>
                                     </div>
                                 </div>
@@ -139,19 +178,19 @@
 
                             <!-- Tone Selector -->
                             <div id="toneContainer">
-                                <label class="block text-sm font-medium text-gray-700 mb-1">Tone</label>
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Tone</label>
                                 <div class="grid grid-cols-3 gap-2">
                                     <label class="cursor-pointer">
                                         <input type="radio" name="tone" value="Professional" class="peer sr-only" checked>
-                                        <div class="text-center px-2 py-2 rounded-lg border border-gray-200 peer-checked:bg-purple-100 peer-checked:border-purple-500 peer-checked:text-purple-700 text-sm transition font-medium">Pro</div>
+                                        <div class="text-center px-2 py-2 rounded-lg border border-gray-200 dark:border-gray-600 dark:text-gray-300 peer-checked:bg-purple-100 dark:peer-checked:bg-purple-900/50 peer-checked:border-purple-500 peer-checked:text-purple-700 dark:peer-checked:text-purple-300 text-sm transition font-medium">Pro</div>
                                     </label>
                                     <label class="cursor-pointer">
                                         <input type="radio" name="tone" value="Casual & Fun" class="peer sr-only">
-                                        <div class="text-center px-2 py-2 rounded-lg border border-gray-200 peer-checked:bg-purple-100 peer-checked:border-purple-500 peer-checked:text-purple-700 text-sm transition font-medium">Fun</div>
+                                        <div class="text-center px-2 py-2 rounded-lg border border-gray-200 dark:border-gray-600 dark:text-gray-300 peer-checked:bg-purple-100 dark:peer-checked:bg-purple-900/50 peer-checked:border-purple-500 peer-checked:text-purple-700 dark:peer-checked:text-purple-300 text-sm transition font-medium">Fun</div>
                                     </label>
                                     <label class="cursor-pointer">
                                         <input type="radio" name="tone" value="Edgy & Witty" class="peer sr-only">
-                                        <div class="text-center px-2 py-2 rounded-lg border border-gray-200 peer-checked:bg-purple-100 peer-checked:border-purple-500 peer-checked:text-purple-700 text-sm transition font-medium">Edgy</div>
+                                        <div class="text-center px-2 py-2 rounded-lg border border-gray-200 dark:border-gray-600 dark:text-gray-300 peer-checked:bg-purple-100 dark:peer-checked:bg-purple-900/50 peer-checked:border-purple-500 peer-checked:text-purple-700 dark:peer-checked:text-purple-300 text-sm transition font-medium">Edgy</div>
                                     </label>
                                 </div>
                             </div>
@@ -165,28 +204,28 @@
                 </div>
 
                 <!-- Right Side: Output Results -->
-                <div class="w-full lg:w-1/2 p-6 md:p-8 bg-gray-50/50 flex flex-col relative">
-                    <div class="flex justify-between items-center mb-4 border-b border-gray-200 pb-2">
-                        <h2 class="text-lg font-semibold text-gray-800">Results</h2>
-                        <button onclick="clearResults()" class="text-xs text-gray-500 hover:text-red-500 transition"><i class="fa-solid fa-trash"></i> Clear</button>
+                <div id="outputSection" class="w-full lg:w-1/2 p-6 md:p-8 bg-gray-50/50 dark:bg-gray-900/50 flex flex-col relative transition-colors">
+                    <div class="flex justify-between items-center mb-4 border-b border-gray-200 dark:border-gray-700 pb-2">
+                        <h2 id="rightSideTitle" class="text-lg font-semibold text-gray-800 dark:text-gray-100">Results</h2>
+                        <button id="clearBtn" onclick="clearResults()" class="text-xs text-gray-500 dark:text-gray-400 hover:text-red-500 dark:hover:text-red-400 transition"><i class="fa-solid fa-trash"></i> Clear</button>
                     </div>
                     
                     <div id="resultsContainer" class="flex-1 overflow-y-auto space-y-4 pr-2">
                         <!-- Empty State -->
-                        <div id="emptyState" class="h-full flex flex-col items-center justify-center text-gray-400">
+                        <div id="emptyState" class="h-full flex flex-col items-center justify-center text-gray-400 dark:text-gray-500">
                             <i class="fa-regular fa-paper-plane text-5xl mb-3 opacity-50"></i>
-                            <p class="text-sm text-center px-4">Select a tool, fill out the details, and let AI do the magic.</p>
+                            <p id="emptyStateText" class="text-sm text-center px-4">Select a tool, fill out the details, and let AI do the magic.</p>
                         </div>
 
                         <!-- Loading State -->
-                        <div id="loadingState" class="hidden h-full flex flex-col items-center justify-center text-purple-600">
+                        <div id="loadingState" class="hidden h-full flex flex-col items-center justify-center text-purple-600 dark:text-purple-400">
                             <i class="fa-solid fa-circle-notch fa-spin text-4xl mb-3"></i>
                             <p class="text-sm font-medium animate-pulse">Crafting AI magic...</p>
                         </div>
                     </div>
 
                     <!-- Toast Notification -->
-                    <div id="toast" class="absolute bottom-6 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white px-4 py-2 rounded-lg text-sm shadow-lg transition-opacity duration-300 opacity-0 pointer-events-none z-50">
+                    <div id="toast" class="absolute bottom-6 left-1/2 transform -translate-x-1/2 bg-gray-800 dark:bg-white text-white dark:text-gray-900 px-4 py-2 rounded-lg text-sm shadow-lg transition-opacity duration-300 opacity-0 pointer-events-none z-50">
                         Copied to clipboard!
                     </div>
                 </div>
@@ -194,16 +233,94 @@
         </div>
     </div>
 
-    <script>
-        // --- Configuration ---
-        const apiKey = ""; // Handled automatically by Canvas/Vercel
+    <!-- Main Logic & Firebase Integration -->
+    <script type="module">
+        // --- 1. Firebase Setup for Secure Accounts & Database ---
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInWithCustomToken, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, addDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // Environment Variables (Handled by Canvas securely)
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'creator-ai-dashboard';
+        
+        let app, auth, db, currentUser = null;
+        let generationHistory = []; // Local memory cache for history
+
+        try {
+            app = initializeApp(firebaseConfig);
+            auth = getAuth(app);
+            db = getFirestore(app);
+
+            // Secure Auth Flow
+            const initAuth = async () => {
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    await signInWithCustomToken(auth, __initial_auth_token);
+                } else {
+                    await signInAnonymously(auth);
+                }
+            };
+            initAuth();
+
+            // Listen for User Session
+            onAuthStateChanged(auth, (user) => {
+                currentUser = user;
+                if (user) {
+                    document.getElementById('userAccountName').innerText = `Creator_${user.uid.substring(0,5)}`;
+                    setupHistoryListener(); // Start syncing database
+                }
+            });
+        } catch (error) {
+            console.warn("Firebase running in offline/demo mode.", error);
+        }
+
+        // Fetch History from Firestore securely
+        function setupHistoryListener() {
+            if (!currentUser) return;
+            const historyRef = collection(db, 'artifacts', appId, 'users', currentUser.uid, 'history');
+            
+            onSnapshot(historyRef, (snapshot) => {
+                generationHistory = [];
+                snapshot.forEach(doc => {
+                    generationHistory.push({ id: doc.id, ...doc.data() });
+                });
+                
+                // Sort by newest first in memory
+                generationHistory.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+                
+                // If user is currently looking at the history tab, re-render it
+                if (currentTool === 'history') {
+                    renderHistoryList();
+                }
+            }, (error) => {
+                console.error("Database connection error", error);
+            });
+        }
+
+        // Save a new generation to Firestore
+        async function saveToDatabase(toolTitle, inputText, resultsArray) {
+            if (!currentUser) return;
+            try {
+                const historyRef = collection(db, 'artifacts', appId, 'users', currentUser.uid, 'history');
+                await addDoc(historyRef, {
+                    tool: toolTitle,
+                    input: inputText,
+                    results: resultsArray,
+                    timestamp: new Date().toISOString()
+                });
+            } catch (e) {
+                console.error("Failed to save to history", e);
+            }
+        }
+
+
+        // --- 2. Configuration & API ---
+        const apiKey = ""; // Keep empty, Vercel/Canvas handles it
         const isNetlifyOrVercel = window.location.hostname.includes('netlify.app') || window.location.hostname.includes('vercel.app');
-        // Point securely to your Vercel backend
         const API_URL = isNetlifyOrVercel 
             ? `/api/generate` 
-            : `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
+            : `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
 
-        // --- UI State Management (The Dashboard Logic) ---
         let currentTool = 'bio';
 
         const toolsConfig = {
@@ -213,17 +330,15 @@
                 icon: "fa-id-badge",
                 inputLabel: "Keywords / About You",
                 placeholder: "e.g. Developer, Coffee Addict, NYC based. Love building apps.",
-                showOptions: true,
-                btnText: "Generate Bios"
+                showOptions: true
             },
             caption: {
                 title: "Viral Captions",
                 desc: "Write engaging captions with emojis and hashtags.",
                 icon: "fa-pen-nib",
                 inputLabel: "What is this post/photo about?",
-                placeholder: "e.g. A photo of my cat sleeping on my laptop keyboard while I'm trying to work.",
-                showOptions: true,
-                btnText: "Write Captions"
+                placeholder: "e.g. A photo of my cat sleeping on my laptop keyboard.",
+                showOptions: true
             },
             hook: {
                 title: "Video Hooks",
@@ -231,121 +346,115 @@
                 icon: "fa-magnet",
                 inputLabel: "What is your video about?",
                 placeholder: "e.g. 3 ways to organize your desk for maximum productivity.",
-                showOptions: false, // Don't need platform/tone for this
-                btnText: "Generate Hooks"
+                showOptions: false
             },
             roast: {
                 title: "Roast My Profile",
                 desc: "Get playfully roasted, then get an improved version.",
                 icon: "fa-fire",
                 inputLabel: "Paste your current bio or profile link here:",
-                placeholder: "e.g. 'Just a guy trying to make it in the world. Follow me.'",
-                showOptions: false,
-                btnText: "Roast Me"
+                placeholder: "e.g. 'Just a guy trying to make it in the world.'",
+                showOptions: false
+            },
+            history: {
+                title: "My History",
+                icon: "fa-clock-rotate-left"
             }
         };
 
-        // DOM Elements
-        const mainInputLabel = document.getElementById('mainInputLabel');
+        // --- 3. UI State Management ---
         const mainInput = document.getElementById('mainInput');
-        const toolTitleText = document.getElementById('toolTitleText');
-        const toolDesc = document.getElementById('toolDesc');
-        const toolIcon = document.getElementById('toolIcon');
         const optionsSection = document.getElementById('optionsSection');
-        const btnText = document.getElementById('btnText');
-        
-        // --- Custom Platform Dropdown Logic ---
-        const platformSelectBtn = document.getElementById('platformSelectBtn');
-        const platformDropdownMenu = document.getElementById('platformDropdownMenu');
-        const selectedPlatformDisplay = document.getElementById('selectedPlatformDisplay');
-        const platformInput = document.getElementById('platformSelect');
-        const platformOptions = document.querySelectorAll('.platform-option');
+        const resultsContainer = document.getElementById('resultsContainer');
+        const emptyState = document.getElementById('emptyState');
+        const emptyStateText = document.getElementById('emptyStateText');
+        const loadingState = document.getElementById('loadingState');
+        const inputSection = document.getElementById('inputSection');
+        const outputSection = document.getElementById('outputSection');
 
-        // Toggle dropdown open/close
-        platformSelectBtn.addEventListener('click', () => {
-            platformDropdownMenu.classList.toggle('hidden');
-        });
-
-        // Handle selecting an option
-        platformOptions.forEach(option => {
-            option.addEventListener('click', () => {
-                const value = option.getAttribute('data-value');
-                const htmlContent = option.innerHTML; // Copies the icon and text
-                
-                platformInput.value = value;
-                selectedPlatformDisplay.innerHTML = htmlContent;
-                platformDropdownMenu.classList.add('hidden'); // Close menu
-            });
-        });
-
-        // Close dropdown if user clicks outside of it
-        document.addEventListener('click', (e) => {
-            if (!platformSelectBtn.contains(e.target) && !platformDropdownMenu.contains(e.target)) {
-                platformDropdownMenu.classList.add('hidden');
-            }
-        });
-
-        // Switch Tools Logic
-        function switchTool(toolKey, event) {
+        window.switchTool = function(toolKey, event) {
             if(event) event.preventDefault();
             currentTool = toolKey;
             const config = toolsConfig[toolKey];
 
-            // Update UI Sidebar
+            // Update Sidebar UI
             document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
             if(event) event.currentTarget.classList.add('active');
 
-            // Update UI Form
-            toolTitleText.innerText = config.title;
-            toolDesc.innerText = config.desc;
-            toolIcon.className = `fa-solid ${config.icon} text-purple-600`;
-            mainInputLabel.innerText = config.inputLabel;
-            mainInput.placeholder = config.placeholder;
-            mainInput.value = ""; // Clear input on switch
-            btnText.innerText = config.btnText;
-
-            if (config.showOptions) {
-                optionsSection.classList.remove('hidden');
+            // Handle standard tools vs History tab
+            if (toolKey === 'history') {
+                inputSection.classList.add('hidden');
+                outputSection.classList.remove('lg:w-1/2');
+                outputSection.classList.add('w-full');
+                document.getElementById('rightSideTitle').innerText = "Saved Generations";
+                document.getElementById('clearBtn').classList.add('hidden');
+                renderHistoryList();
             } else {
-                optionsSection.classList.add('hidden');
+                inputSection.classList.remove('hidden');
+                outputSection.classList.add('lg:w-1/2');
+                outputSection.classList.remove('w-full');
+                
+                document.getElementById('toolTitleText').innerText = config.title;
+                document.getElementById('toolDesc').innerText = config.desc;
+                document.getElementById('toolIcon').className = `fa-solid ${config.icon} text-purple-600 dark:text-purple-400`;
+                document.getElementById('mainInputLabel').innerText = config.inputLabel;
+                mainInput.placeholder = config.placeholder;
+                document.getElementById('rightSideTitle').innerText = "Results";
+                document.getElementById('clearBtn').classList.remove('hidden');
+                
+                optionsSection.classList.toggle('hidden', !config.showOptions);
+                window.clearResults();
             }
 
-            // Close mobile menu if open
-            toggleMobileMenu(false);
-        }
+            toggleMobileMenu(true); // Close mobile menu
+        };
 
-        // --- Mobile Menu Logic ---
-        const sidebar = document.getElementById('sidebar');
-        const overlay = document.getElementById('overlay');
-        const mobileMenuBtn = document.getElementById('mobileMenuBtn');
-
-        function toggleMobileMenu(forceClose = false) {
-            if (forceClose || !sidebar.classList.contains('-translate-x-full')) {
-                sidebar.classList.add('-translate-x-full');
-                overlay.classList.add('hidden');
-            } else {
-                sidebar.classList.remove('-translate-x-full');
-                overlay.classList.remove('hidden');
+        // --- 4. History Rendering ---
+        function renderHistoryList() {
+            Array.from(resultsContainer.querySelectorAll('.result-card')).forEach(el => el.remove());
+            
+            if (generationHistory.length === 0) {
+                emptyState.classList.remove('hidden');
+                emptyStateText.innerText = "No history yet. Start generating content!";
+                return;
             }
+
+            emptyState.classList.add('hidden');
+
+            generationHistory.forEach(item => {
+                const date = new Date(item.timestamp).toLocaleDateString();
+                const card = document.createElement('div');
+                card.className = "result-card bg-white dark:bg-gray-800 p-5 rounded-xl border border-gray-100 dark:border-gray-700 shadow-sm relative mb-4";
+                
+                let resultsHtml = item.results.map(res => 
+                    `<div class="bg-gray-50 dark:bg-gray-700/50 p-3 rounded-lg text-sm text-gray-700 dark:text-gray-300 mb-2 relative group">
+                        <p class="pr-6">${res}</p>
+                        <button onclick='window.copyToClipboard(${JSON.stringify(res).replace(/'/g, "&#39;")})' class="absolute top-2 right-2 text-gray-400 hover:text-purple-500 opacity-0 group-hover:opacity-100 transition"><i class="fa-regular fa-copy"></i></button>
+                    </div>`
+                ).join('');
+
+                card.innerHTML = `
+                    <div class="flex justify-between items-start mb-3">
+                        <span class="text-xs font-bold text-purple-600 dark:text-purple-400 bg-purple-50 dark:bg-purple-900/30 px-2 py-1 rounded">${item.tool}</span>
+                        <span class="text-xs text-gray-400">${date}</span>
+                    </div>
+                    <p class="text-sm font-medium text-gray-600 dark:text-gray-400 mb-3 border-l-2 border-gray-200 dark:border-gray-600 pl-2">"${item.input}"</p>
+                    <div class="space-y-2">
+                        ${resultsHtml}
+                    </div>
+                `;
+                resultsContainer.appendChild(card);
+            });
         }
-        mobileMenuBtn.addEventListener('click', () => toggleMobileMenu());
-        overlay.addEventListener('click', () => toggleMobileMenu(true));
 
-        // --- API Generation Logic ---
-        const generateBtn = document.getElementById('generateBtn');
-        const resultsContainer = document.getElementById('resultsContainer');
-        const emptyState = document.getElementById('emptyState');
-        const loadingState = document.getElementById('loadingState');
-        const toast = document.getElementById('toast');
-
-        async function generateContent() {
+        // --- 5. Generate Content API Call ---
+        window.generateContent = async function() {
             const inputText = mainInput.value.trim();
             const platform = document.getElementById('platformSelect').value;
             const tone = document.querySelector('input[name="tone"]:checked').value;
 
             if (!inputText) {
-                showToast("Please enter some text first!");
-                mainInput.focus();
+                window.showToast("Please enter some text first!");
                 return;
             }
 
@@ -354,31 +463,25 @@
             Array.from(resultsContainer.querySelectorAll('.result-card')).forEach(el => el.remove());
             loadingState.classList.remove('hidden');
             loadingState.classList.add('flex');
-            generateBtn.disabled = true;
-            generateBtn.classList.add('opacity-50', 'cursor-not-allowed');
-
-            // 🧠 DYNAMIC PROMPTS (This is the magic sauce for a multi-tool app)
-            let systemPrompt = "";
             
+            const btn = document.getElementById('generateBtn');
+            btn.disabled = true;
+            btn.classList.add('opacity-50');
+
+            // Prompts
+            let systemPrompt = "";
             if (currentTool === 'bio') {
-                systemPrompt = `You are an expert social media copywriter. Generate EXACTLY 3 unique bio options based on the user input. Platform: ${platform}. Tone: ${tone}. Include emojis. Format strictly as a JSON array of strings.`;
-            } 
-            else if (currentTool === 'caption') {
-                systemPrompt = `You are an expert social media manager. Generate EXACTLY 3 highly engaging, viral captions for a ${platform} post based on the user's description. Tone: ${tone}. Include excellent hook lines, spacing, emojis, and 3-5 relevant hashtags at the bottom of each. Format strictly as a JSON array of strings.`;
-            }
-            else if (currentTool === 'hook') {
-                systemPrompt = `You are a viral TikTok/Shorts producer. The user will provide a video topic. Generate EXACTLY 5 incredibly catchy, scroll-stopping opening verbal hooks (just 1-2 sentences each) for the video. Format strictly as a JSON array of strings.`;
-            }
-            else if (currentTool === 'roast') {
-                systemPrompt = `You are a savage but helpful comedian. The user has provided their current bio. 
-                Generate EXACTLY 2 items in this order:
-                Item 1: A hilarious, sarcastic roast of their current bio.
-                Item 2: A highly optimized, professional, and excellent rewrite of their bio.
-                Format strictly as a JSON array of strings containing exactly these 2 items.`;
+                systemPrompt = `You are an expert copywriter. Generate EXACTLY 3 unique bio options based on the user input. Platform: ${platform}. Tone: ${tone}. Include emojis. Format strictly as a JSON array of strings.`;
+            } else if (currentTool === 'caption') {
+                systemPrompt = `You are a social media manager. Generate EXACTLY 3 highly engaging captions for a ${platform} post. Tone: ${tone}. Include hooks, emojis, and hashtags. Format strictly as a JSON array of strings.`;
+            } else if (currentTool === 'hook') {
+                systemPrompt = `You are a TikTok producer. Generate EXACTLY 5 scroll-stopping opening verbal hooks (1-2 sentences each) for the video topic. Format strictly as a JSON array of strings.`;
+            } else if (currentTool === 'roast') {
+                systemPrompt = `You are a comedian. Item 1: A sarcastic roast of their bio. Item 2: A professional rewrite of their bio. Format strictly as a JSON array of exactly 2 strings.`;
             }
 
             const payload = {
-                contents: [{ parts: [{ text: `User Input: ${inputText}` }] }],
+                contents: [{ parts: [{ text: `Input: ${inputText}` }] }],
                 systemInstruction: { parts: [{ text: systemPrompt }] },
                 generationConfig: {
                     responseMimeType: "application/json",
@@ -397,46 +500,43 @@
 
                 const data = await response.json();
                 const rawText = data.candidates?.[0]?.content?.parts?.[0]?.text;
-                
                 let resultsArray = JSON.parse(rawText);
+                
                 renderResults(resultsArray);
+                
+                // SAVE TO DATABASE
+                saveToDatabase(toolsConfig[currentTool].title, inputText, resultsArray);
 
             } catch (error) {
                 console.error("Error:", error);
-                showToast("Error connecting to AI. Please try again.");
+                window.showToast("Error connecting to AI.");
                 emptyState.classList.remove('hidden');
             } finally {
                 loadingState.classList.add('hidden');
                 loadingState.classList.remove('flex');
-                generateBtn.disabled = false;
-                generateBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+                btn.disabled = false;
+                btn.classList.remove('opacity-50');
             }
-        }
+        };
 
-        // --- UI: Render Results ---
+        // --- 6. Helpers & UI Actions ---
         function renderResults(resultsArray) {
-            if (!resultsArray || resultsArray.length === 0) {
-                emptyState.classList.remove('hidden');
-                return;
-            }
-
             resultsArray.forEach((text, index) => {
                 const card = document.createElement('div');
-                card.className = "result-card bg-white p-5 rounded-xl border border-gray-100 shadow-sm relative group hover:shadow-md hover:border-purple-200 transition-all";
+                card.className = "result-card bg-white dark:bg-gray-800 p-5 rounded-xl border border-gray-100 dark:border-gray-700 shadow-sm relative group mb-4";
                 
-                // Special labels for the Roast tool
                 let labelHtml = "";
                 if (currentTool === 'roast') {
                     const labelText = index === 0 ? "🔥 The Roast" : "✨ The Upgrade";
-                    const labelColor = index === 0 ? "text-orange-500 bg-orange-50" : "text-purple-600 bg-purple-50";
+                    const labelColor = index === 0 ? "text-orange-500 bg-orange-50 dark:bg-orange-900/30" : "text-purple-600 bg-purple-50 dark:bg-purple-900/30";
                     labelHtml = `<span class="inline-block px-2 py-1 rounded text-xs font-bold mb-2 ${labelColor}">${labelText}</span><br>`;
                 }
 
                 card.innerHTML = `
                     ${labelHtml}
-                    <p class="text-gray-700 text-sm whitespace-pre-wrap pr-8 leading-relaxed">${text}</p>
-                    <button onclick='copyToClipboard(${JSON.stringify(text).replace(/'/g, "&#39;")})' 
-                            class="absolute top-3 right-3 text-gray-400 hover:text-purple-600 transition p-2 rounded-lg hover:bg-purple-50 opacity-0 group-hover:opacity-100 focus:opacity-100" title="Copy text">
+                    <p class="text-gray-700 dark:text-gray-200 text-sm whitespace-pre-wrap pr-8 leading-relaxed">${text}</p>
+                    <button onclick='window.copyToClipboard(${JSON.stringify(text).replace(/'/g, "&#39;")})' 
+                            class="absolute top-3 right-3 text-gray-400 hover:text-purple-600 dark:hover:text-purple-400 transition p-2 rounded-lg hover:bg-purple-50 dark:hover:bg-gray-700 opacity-0 group-hover:opacity-100">
                         <i class="fa-regular fa-copy"></i>
                     </button>
                 `;
@@ -444,37 +544,72 @@
             });
         }
 
-        function clearResults() {
+        window.clearResults = function() {
             Array.from(resultsContainer.querySelectorAll('.result-card')).forEach(el => el.remove());
             emptyState.classList.remove('hidden');
             mainInput.value = "";
-        }
+        };
 
-        // --- Helper: Copy & Toast ---
-        function copyToClipboard(text) {
+        window.copyToClipboard = function(text) {
             const textArea = document.createElement("textarea");
             textArea.value = text;
             document.body.appendChild(textArea);
             textArea.select();
-            try {
-                document.execCommand('copy');
-                showToast("Copied to clipboard!");
-            } catch (err) {
-                console.error('Copy failed', err);
-            }
+            document.execCommand('copy');
             document.body.removeChild(textArea);
-        }
+            window.showToast("Copied to clipboard!");
+        };
 
-        function showToast(msg) {
+        window.showToast = function(msg) {
+            const toast = document.getElementById('toast');
             toast.textContent = msg;
             toast.classList.remove('opacity-0');
             setTimeout(() => toast.classList.add('opacity-0'), 2500);
-        }
+        };
 
-        // Initialize event listeners
-        generateBtn.addEventListener('click', generateContent);
+        // Dark Mode Toggle
+        window.toggleTheme = function() {
+            const html = document.documentElement;
+            html.classList.toggle('dark');
+            const isDark = html.classList.contains('dark');
+            
+            // Update icons
+            document.getElementById('desktopThemeIcon').className = `fa-solid ${isDark ? 'fa-sun text-yellow-400' : 'fa-moon'} w-5 text-center`;
+            document.getElementById('mobileThemeIcon').className = `fa-solid ${isDark ? 'fa-sun text-yellow-400' : 'fa-moon'}`;
+        };
+
+        // Custom Dropdown Logic
+        const platformSelectBtn = document.getElementById('platformSelectBtn');
+        const platformDropdownMenu = document.getElementById('platformDropdownMenu');
+        platformSelectBtn.addEventListener('click', () => platformDropdownMenu.classList.toggle('hidden'));
+        
+        document.querySelectorAll('.platform-option').forEach(option => {
+            option.addEventListener('click', () => {
+                document.getElementById('platformSelect').value = option.getAttribute('data-value');
+                document.getElementById('selectedPlatformDisplay').innerHTML = option.innerHTML;
+                platformDropdownMenu.classList.add('hidden');
+            });
+        });
+
+        // Mobile Menu Logic
+        function toggleMobileMenu(forceClose = false) {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('overlay');
+            if (forceClose || !sidebar.classList.contains('-translate-x-full')) {
+                sidebar.classList.add('-translate-x-full');
+                overlay.classList.add('hidden');
+            } else {
+                sidebar.classList.remove('-translate-x-full');
+                overlay.classList.remove('hidden');
+            }
+        }
+        document.getElementById('mobileMenuBtn').addEventListener('click', () => toggleMobileMenu());
+        document.getElementById('overlay').addEventListener('click', () => toggleMobileMenu(true));
+
+        // Event Listeners for Generation
+        document.getElementById('generateBtn').addEventListener('click', window.generateContent);
         mainInput.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) generateContent();
+            if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) window.generateContent();
         });
     </script>
 </body>
