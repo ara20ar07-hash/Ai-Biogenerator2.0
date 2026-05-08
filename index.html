@@ -3,7 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Creator Dashboard</title>
+   <title>CreatorKit | AI Tools for Social Media Growth</title>
+    <meta name="title" content="CreatorKit | AI Tools for Social Media Growth">
+    <meta name="description" content="The ultimate AI dashboard for content creators. Instantly generate viral TikTok hooks, Instagram bios, engaging captions, and playfully roast your profile.">
+    <meta name="keywords" content="AI creator tools, TikTok hook generator, Instagram bio generator, AI caption writer, social media growth, AI for creators">
+    <meta name="author" content="Your Name">
+
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://ai-biogenerator2-0.vercel.app/">
+    <meta property="og:title" content="GeniusCreator | AI Tools for Social Media Growth">
+    <meta property="og:description" content="The ultimate AI dashboard for content creators. Instantly generate viral hooks, bios, and engaging captions.">
+    <meta property="og:image" content="https://images.unsplash.com/photo-1611162617474-5b21e879e113?q=80&w=1200&auto=format&fit=crop">
+
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://your-vercel-link.vercel.app/">
+    <meta property="twitter:title" content="GeniusCreator | AI Tools for Social Media Growth">
+    <meta property="twitter:description" content="The ultimate AI dashboard for content creators. Instantly generate viral hooks, bios, and engaging captions.">
+    <meta property="twitter:image" content="https://images.unsplash.com/photo-1611162617474-5b21e879e113?q=80&w=1200&auto=format&fit=crop">
     <!-- Google Analytics -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-024D3RJ6JT"></script>
     <script>
@@ -61,7 +77,7 @@
     <!-- Mobile Header -->
     <div class="md:hidden fixed top-0 w-full glass-panel z-50 p-4 flex justify-between items-center shadow-sm">
         <h1 class="text-xl font-bold text-gray-800 dark:text-white flex items-center gap-2">
-            <i class="fa-solid fa-bolt text-purple-600 dark:text-purple-400"></i> CreatorAI
+            <i class="fa-solid fa-bolt text-purple-600 dark:text-purple-400"></i> GeniusCreator
         </h1>
         <div class="flex items-center gap-4">
             <button onclick="toggleTheme()" class="text-gray-600 dark:text-gray-300 text-xl"><i id="mobileThemeIcon" class="fa-solid fa-moon"></i></button>
@@ -73,7 +89,7 @@
     <div id="sidebar" class="w-64 glass-panel border-r border-white/50 dark:border-gray-700/50 flex-shrink-0 flex flex-col absolute md:relative z-40 h-full transform -translate-x-full md:translate-x-0 transition-transform duration-300">
         <div class="p-6 hidden md:block border-b border-gray-200/50 dark:border-gray-700/50">
             <h1 class="text-2xl font-bold text-gray-800 dark:text-white flex items-center gap-2">
-                <i class="fa-solid fa-layer-group text-purple-600 dark:text-purple-400"></i> CreatorAI
+                <i class="fa-solid fa-layer-group text-purple-600 dark:text-purple-400"></i> GeniusCreator
             </h1>
         </div>
         
@@ -324,12 +340,12 @@
         let currentTool = 'bio';
 
         const toolsConfig = {
-            bio: {
+           bio: {
                 title: "Bio Generator",
                 desc: "Generate the perfect social media bio in seconds.",
                 icon: "fa-id-badge",
-                inputLabel: "Keywords / About You",
-                placeholder: "e.g. Developer, Coffee Addict, NYC based. Love building apps.",
+                inputLabel: "Tell us about yourself",
+                placeholder: "e.g Fitness coach, love pizza, helping moms get strong...",
                 showOptions: true
             },
             caption: {
