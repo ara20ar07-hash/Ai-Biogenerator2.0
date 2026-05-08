@@ -3,23 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-   <title>CreatorKit | AI Tools for Social Media Growth</title>
+    
+    <!-- Primary Meta Tags -->
+    <title>CreatorKit | AI Tools for Social Media Growth</title>
     <meta name="title" content="CreatorKit | AI Tools for Social Media Growth">
     <meta name="description" content="The ultimate AI dashboard for content creators. Instantly generate viral TikTok hooks, Instagram bios, engaging captions, and playfully roast your profile.">
     <meta name="keywords" content="AI creator tools, TikTok hook generator, Instagram bio generator, AI caption writer, social media growth, AI for creators">
-    <meta name="author" content="Your Name">
+    <meta name="author" content="CreatorKit">
 
+    <!-- Open Graph / Facebook (How it looks when shared on social media) -->
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://ai-biogenerator2-0.vercel.app/">
-    <meta property="og:title" content="GeniusCreator | AI Tools for Social Media Growth">
+    <meta property="og:title" content="CreatorKit | AI Tools for Social Media Growth">
     <meta property="og:description" content="The ultimate AI dashboard for content creators. Instantly generate viral hooks, bios, and engaging captions.">
     <meta property="og:image" content="https://images.unsplash.com/photo-1611162617474-5b21e879e113?q=80&w=1200&auto=format&fit=crop">
 
+    <!-- Twitter -->
     <meta property="twitter:card" content="summary_large_image">
-    <meta property="twitter:url" content="https://your-vercel-link.vercel.app/">
-    <meta property="twitter:title" content="GeniusCreator | AI Tools for Social Media Growth">
+    <meta property="twitter:url" content="https://ai-biogenerator2-0.vercel.app/">
+    <meta property="twitter:title" content="CreatorKit | AI Tools for Social Media Growth">
     <meta property="twitter:description" content="The ultimate AI dashboard for content creators. Instantly generate viral hooks, bios, and engaging captions.">
     <meta property="twitter:image" content="https://images.unsplash.com/photo-1611162617474-5b21e879e113?q=80&w=1200&auto=format&fit=crop">
+
     <!-- Google Analytics -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-024D3RJ6JT"></script>
     <script>
@@ -77,7 +82,7 @@
     <!-- Mobile Header -->
     <div class="md:hidden fixed top-0 w-full glass-panel z-50 p-4 flex justify-between items-center shadow-sm">
         <h1 class="text-xl font-bold text-gray-800 dark:text-white flex items-center gap-2">
-            <i class="fa-solid fa-bolt text-purple-600 dark:text-purple-400"></i> GeniusCreator
+            <i class="fa-solid fa-bolt text-purple-600 dark:text-purple-400"></i> CreatorKit
         </h1>
         <div class="flex items-center gap-4">
             <button onclick="toggleTheme()" class="text-gray-600 dark:text-gray-300 text-xl"><i id="mobileThemeIcon" class="fa-solid fa-moon"></i></button>
@@ -89,7 +94,7 @@
     <div id="sidebar" class="w-64 glass-panel border-r border-white/50 dark:border-gray-700/50 flex-shrink-0 flex flex-col absolute md:relative z-40 h-full transform -translate-x-full md:translate-x-0 transition-transform duration-300">
         <div class="p-6 hidden md:block border-b border-gray-200/50 dark:border-gray-700/50">
             <h1 class="text-2xl font-bold text-gray-800 dark:text-white flex items-center gap-2">
-                <i class="fa-solid fa-layer-group text-purple-600 dark:text-purple-400"></i> GeniusCreator
+                <i class="fa-solid fa-layer-group text-purple-600 dark:text-purple-400"></i> CreatorKit
             </h1>
         </div>
         
@@ -122,15 +127,33 @@
                 </nav>
             </div>
             
+            <!-- User Authentication Section -->
             <div class="px-6 py-4 mt-auto border-t border-gray-200/50 dark:border-gray-700/50">
-                <div class="flex items-center gap-3">
-                    <div class="w-8 h-8 rounded-full bg-gradient-to-r from-purple-500 to-indigo-500 flex items-center justify-center text-white font-bold text-sm">
-                        <i class="fa-solid fa-user"></i>
+                
+                <!-- State 1: Logged In (Hidden by default) -->
+                <div id="loggedInState" class="hidden flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <img id="userAvatar" src="" class="w-8 h-8 rounded-full bg-gradient-to-r from-purple-500 to-indigo-500 flex items-center justify-center text-white object-cover shadow-sm">
+                        <div class="overflow-hidden">
+                            <p class="text-sm font-semibold text-gray-800 dark:text-gray-200 truncate w-24" id="userAccountName">Creator</p>
+                            <button onclick="handleSignOut()" class="text-xs text-red-500 hover:text-red-600 dark:text-red-400 font-medium transition">Sign Out</button>
+                        </div>
                     </div>
-                    <div>
-                        <p class="text-sm font-semibold text-gray-800 dark:text-gray-200" id="userAccountName">Connecting...</p>
-                        <p class="text-xs text-green-500 font-medium flex items-center gap-1"><i class="fa-solid fa-circle text-[8px]"></i> Online</p>
-                    </div>
+                </div>
+
+                <!-- State 2: Logged Out (Visible by default) -->
+                <div id="loggedOutState" class="block">
+                    <button onclick="signInWithGoogle()" class="w-full flex items-center justify-center gap-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-200 text-sm font-semibold py-2 px-4 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition shadow-sm">
+                        <!-- Google SVG Icon -->
+                        <svg class="w-4 h-4" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+                            <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+                            <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
+                            <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+                        </svg>
+                        Sign in
+                    </button>
+                    <p class="text-[10px] text-gray-400 dark:text-gray-500 text-center mt-2">Sync history across devices</p>
                 </div>
             </div>
         </div>
@@ -156,8 +179,8 @@
                     <div class="space-y-5 flex-1">
                         <!-- Main Text Input -->
                         <div>
-                            <label id="mainInputLabel" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Keywords about you</label>
-                            <textarea id="mainInput" rows="3" placeholder="e.g. Developer, Coffee Addict, NYC" class="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-600 focus:border-purple-500 focus:ring-2 focus:ring-purple-200 dark:focus:ring-purple-900 transition outline-none bg-white/80 dark:bg-gray-700/80 dark:text-white resize-none"></textarea>
+                            <label id="mainInputLabel" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Tell us about yourself</label>
+                            <textarea id="mainInput" rows="3" placeholder="e.g. Fitness coach, love pizza, helping moms get strong..." class="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-600 focus:border-purple-500 focus:ring-2 focus:ring-purple-200 dark:focus:ring-purple-900 transition outline-none bg-white/80 dark:bg-gray-700/80 dark:text-white resize-none"></textarea>
                         </div>
 
                         <!-- Options Section -->
@@ -223,7 +246,17 @@
                 <div id="outputSection" class="w-full lg:w-1/2 p-6 md:p-8 bg-gray-50/50 dark:bg-gray-900/50 flex flex-col relative transition-colors">
                     <div class="flex justify-between items-center mb-4 border-b border-gray-200 dark:border-gray-700 pb-2">
                         <h2 id="rightSideTitle" class="text-lg font-semibold text-gray-800 dark:text-gray-100">Results</h2>
-                        <button id="clearBtn" onclick="clearResults()" class="text-xs text-gray-500 dark:text-gray-400 hover:text-red-500 dark:hover:text-red-400 transition"><i class="fa-solid fa-trash"></i> Clear</button>
+                        
+                        <div class="flex items-center gap-4">
+                            <!-- New Export to CSV Button (Hidden by default, shown on History tab) -->
+                            <button id="exportCsvBtn" onclick="exportHistoryCSV()" class="hidden text-xs text-green-600 dark:text-green-400 hover:text-green-700 dark:hover:text-green-300 transition font-medium">
+                                <i class="fa-solid fa-file-csv"></i> Export CSV
+                            </button>
+                            <!-- Clear Button -->
+                            <button id="clearBtn" onclick="clearResults()" class="text-xs text-gray-500 dark:text-gray-400 hover:text-red-500 dark:hover:text-red-400 transition">
+                                <i class="fa-solid fa-trash"></i> Clear
+                            </button>
+                        </div>
                     </div>
                     
                     <div id="resultsContainer" class="flex-1 overflow-y-auto space-y-4 pr-2">
@@ -253,44 +286,90 @@
     <script type="module">
         // --- 1. Firebase Setup for Secure Accounts & Database ---
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInWithCustomToken, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getAuth, signInWithCustomToken, signInAnonymously, onAuthStateChanged, GoogleAuthProvider, signInWithPopup, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, collection, addDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // Environment Variables (Handled by Canvas securely)
+        // Environment Variables
         const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'creator-ai-dashboard';
         
         let app, auth, db, currentUser = null;
-        let generationHistory = []; // Local memory cache for history
+        let generationHistory = [];
 
         try {
             app = initializeApp(firebaseConfig);
             auth = getAuth(app);
             db = getFirestore(app);
 
-            // Secure Auth Flow
+            // Handle Initial Load
             const initAuth = async () => {
+                // If inside Canvas environment, log in automatically
                 if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
                     await signInWithCustomToken(auth, __initial_auth_token);
-                } else {
-                    await signInAnonymously(auth);
-                }
+                } 
             };
             initAuth();
 
-            // Listen for User Session
+            // Listen for User Session Changes
             onAuthStateChanged(auth, (user) => {
                 currentUser = user;
-                if (user) {
-                    document.getElementById('userAccountName').innerText = `Creator_${user.uid.substring(0,5)}`;
-                    setupHistoryListener(); // Start syncing database
+                const loggedInUI = document.getElementById('loggedInState');
+                const loggedOutUI = document.getElementById('loggedOutState');
+                
+                if (user && !user.isAnonymous) {
+                    // They are logged in with a real account (or Canvas token)
+                    loggedOutUI.classList.add('hidden');
+                    loggedInUI.classList.remove('hidden');
+                    
+                    // Update UI with Google Profile Data
+                    const displayName = user.displayName || `Creator_${user.uid.substring(0,5)}`;
+                    document.getElementById('userAccountName').innerText = displayName;
+                    
+                    if (user.photoURL) {
+                        document.getElementById('userAvatar').src = user.photoURL;
+                        // remove default gradient if they have a photo
+                        document.getElementById('userAvatar').classList.remove('bg-gradient-to-r', 'from-purple-500', 'to-indigo-500');
+                    }
+                    
+                    setupHistoryListener(); // Fetch their database history
+                    
+                } else {
+                    // They are logged out
+                    loggedInUI.classList.add('hidden');
+                    loggedOutUI.classList.remove('hidden');
+                    generationHistory = [];
+                    if (currentTool === 'history') renderHistoryList();
                 }
             });
         } catch (error) {
             console.warn("Firebase running in offline/demo mode.", error);
         }
 
-        // Fetch History from Firestore securely
+        // --- Auth Functions triggered by buttons ---
+        const googleProvider = new GoogleAuthProvider();
+        
+        window.signInWithGoogle = async () => {
+            try {
+                await signInWithPopup(auth, googleProvider);
+            } catch (error) {
+                console.error("Login Failed", error);
+                window.showToast("Sign in failed. Check your connection.");
+            }
+        };
+
+        window.handleSignOut = async () => {
+            try {
+                await signOut(auth);
+                window.showToast("Signed out successfully.");
+                if (currentTool === 'history') {
+                    window.switchTool('bio', null); // redirect to home
+                }
+            } catch (error) {
+                console.error("Sign Out Failed", error);
+            }
+        };
+
+        // --- Database History ---
         function setupHistoryListener() {
             if (!currentUser) return;
             const historyRef = collection(db, 'artifacts', appId, 'users', currentUser.uid, 'history');
@@ -301,10 +380,8 @@
                     generationHistory.push({ id: doc.id, ...doc.data() });
                 });
                 
-                // Sort by newest first in memory
                 generationHistory.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
                 
-                // If user is currently looking at the history tab, re-render it
                 if (currentTool === 'history') {
                     renderHistoryList();
                 }
@@ -313,9 +390,11 @@
             });
         }
 
-        // Save a new generation to Firestore
         async function saveToDatabase(toolTitle, inputText, resultsArray) {
-            if (!currentUser) return;
+            if (!currentUser) {
+                window.showToast("Log in to save history!");
+                return;
+            }
             try {
                 const historyRef = collection(db, 'artifacts', appId, 'users', currentUser.uid, 'history');
                 await addDoc(historyRef, {
@@ -329,9 +408,46 @@
             }
         }
 
+        // --- Export CSV Logic ---
+        window.exportHistoryCSV = function() {
+            if (generationHistory.length === 0) {
+                window.showToast("Your history is empty!");
+                return;
+            }
+
+            let csvContent = "data:text/csv;charset=utf-8,";
+            // CSV Headers
+            csvContent += "Date,Tool,Input,Generated Content\n";
+
+            generationHistory.forEach(item => {
+                const date = new Date(item.timestamp).toLocaleDateString();
+                
+                // Escape quotes for CSV format
+                const safeTool = item.tool.replace(/"/g, '""');
+                const safeInput = item.input.replace(/"/g, '""');
+                
+                // Join the 3 bios/captions together with a bar | separator
+                const combinedResults = item.results.join(" | ").replace(/"/g, '""');
+                
+                // Add row
+                csvContent += `"${date}","${safeTool}","${safeInput}","${combinedResults}"\n`;
+            });
+
+            // Trigger the download
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", "CreatorKit_History.csv");
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            window.showToast("Exported to CSV!");
+        };
+
 
         // --- 2. Configuration & API ---
-        const apiKey = ""; // Keep empty, Vercel/Canvas handles it
+        const apiKey = ""; // Vercel handles this securely
         const isNetlifyOrVercel = window.location.hostname.includes('netlify.app') || window.location.hostname.includes('vercel.app');
         const API_URL = isNetlifyOrVercel 
             ? `/api/generate` 
@@ -340,12 +456,12 @@
         let currentTool = 'bio';
 
         const toolsConfig = {
-           bio: {
+            bio: {
                 title: "Bio Generator",
                 desc: "Generate the perfect social media bio in seconds.",
                 icon: "fa-id-badge",
                 inputLabel: "Tell us about yourself",
-                placeholder: "e.g Fitness coach, love pizza, helping moms get strong...",
+                placeholder: "e.g. Fitness coach, love pizza, helping moms get strong...",
                 showOptions: true
             },
             caption: {
@@ -397,13 +513,16 @@
             document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
             if(event) event.currentTarget.classList.add('active');
 
-            // Handle standard tools vs History tab
+            // Handle History tab vs Regular Tools
             if (toolKey === 'history') {
                 inputSection.classList.add('hidden');
                 outputSection.classList.remove('lg:w-1/2');
                 outputSection.classList.add('w-full');
+                
                 document.getElementById('rightSideTitle').innerText = "Saved Generations";
                 document.getElementById('clearBtn').classList.add('hidden');
+                document.getElementById('exportCsvBtn').classList.remove('hidden'); // Show CSV button
+                
                 renderHistoryList();
             } else {
                 inputSection.classList.remove('hidden');
@@ -415,20 +534,28 @@
                 document.getElementById('toolIcon').className = `fa-solid ${config.icon} text-purple-600 dark:text-purple-400`;
                 document.getElementById('mainInputLabel').innerText = config.inputLabel;
                 mainInput.placeholder = config.placeholder;
+                
                 document.getElementById('rightSideTitle').innerText = "Results";
                 document.getElementById('clearBtn').classList.remove('hidden');
+                document.getElementById('exportCsvBtn').classList.add('hidden'); // Hide CSV button
                 
                 optionsSection.classList.toggle('hidden', !config.showOptions);
                 window.clearResults();
             }
 
-            toggleMobileMenu(true); // Close mobile menu
+            toggleMobileMenu(true); 
         };
 
         // --- 4. History Rendering ---
         function renderHistoryList() {
             Array.from(resultsContainer.querySelectorAll('.result-card')).forEach(el => el.remove());
             
+            if (!currentUser) {
+                emptyState.classList.remove('hidden');
+                emptyStateText.innerText = "Please sign in to view your history.";
+                return;
+            }
+
             if (generationHistory.length === 0) {
                 emptyState.classList.remove('hidden');
                 emptyStateText.innerText = "No history yet. Start generating content!";
@@ -503,7 +630,7 @@
                     responseMimeType: "application/json",
                     responseSchema: { type: "ARRAY", items: { type: "STRING" } }
                 }
-            };
+            }
 
             try {
                 const response = await fetch(API_URL, {
@@ -520,8 +647,12 @@
                 
                 renderResults(resultsArray);
                 
-                // SAVE TO DATABASE
-                saveToDatabase(toolsConfig[currentTool].title, inputText, resultsArray);
+                // SAVE TO DATABASE (Only if logged in)
+                if(currentUser) {
+                    saveToDatabase(toolsConfig[currentTool].title, inputText, resultsArray);
+                } else {
+                    window.showToast("Sign in to save this automatically!");
+                }
 
             } catch (error) {
                 console.error("Error:", error);
@@ -589,7 +720,6 @@
             html.classList.toggle('dark');
             const isDark = html.classList.contains('dark');
             
-            // Update icons
             document.getElementById('desktopThemeIcon').className = `fa-solid ${isDark ? 'fa-sun text-yellow-400' : 'fa-moon'} w-5 text-center`;
             document.getElementById('mobileThemeIcon').className = `fa-solid ${isDark ? 'fa-sun text-yellow-400' : 'fa-moon'}`;
         };
