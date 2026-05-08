@@ -290,8 +290,15 @@
         import { getFirestore, collection, addDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         // Environment Variables
-        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'creator-ai-dashboard';
+       const firebaseConfig = {
+  apiKey: "AIzaSyBmJdtlXRjIVp3cMbQwKCcFGYgwozLjo2k",
+  authDomain: "creatorkit-e7832.firebaseapp.com",
+  projectId: "creatorkit-e7832",
+  storageBucket: "creatorkit-e7832.firebasestorage.app",
+  messagingSenderId: "816063437935",
+  appId: "1:816063437935:web:03e8a3ec0923eb83f4019a",
+  measurementId: "G-XH4E6DHDQ5"
+};
         
         let app, auth, db, currentUser = null;
         let generationHistory = [];
