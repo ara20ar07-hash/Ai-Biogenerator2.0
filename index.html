@@ -289,16 +289,17 @@
         import { getAuth, signInWithCustomToken, signInAnonymously, onAuthStateChanged, GoogleAuthProvider, signInWithPopup, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, collection, addDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // Environment Variables
-       const firebaseConfig = {
-  apiKey: "AIzaSyBmJdtlXRjIVp3cMbQwKCcFGYgwozLjo2k",
-  authDomain: "creatorkit-e7832.firebaseapp.com",
-  projectId: "creatorkit-e7832",
-  storageBucket: "creatorkit-e7832.firebasestorage.app",
-  messagingSenderId: "816063437935",
-  appId: "1:816063437935:web:03e8a3ec0923eb83f4019a",
-  measurementId: "G-XH4E6DHDQ5"
-};
+        // Your real Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyBmJdtlXRjIVp3cMbQwKCcFGYgwozLjo2k",
+            authDomain: "creatorkit-e7832.firebaseapp.com",
+            projectId: "creatorkit-e7832",
+            storageBucket: "creatorkit-e7832.firebasestorage.app",
+            messagingSenderId: "816063437935",
+            appId: "1:816063437935:web:03e8a3ec0923eb83f4019a",
+            measurementId: "G-XH4E6DHDQ5"
+        };
+        const appId = 'creator-ai-dashboard'; // This groups your database items securely
         
         let app, auth, db, currentUser = null;
         let generationHistory = [];
@@ -310,10 +311,20 @@
 
             // Handle Initial Load
             const initAuth = async () => {
-                // If inside Canvas environment, log in automatically
-                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                    await signInWithCustomToken(auth, __initial_auth_token);
-                } 
+                try {
+                    if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                        await signInWithCustomToken(auth, __initial_auth_token);
+                    } else {
+                        await signInAnonymously(auth);
+                    }
+                } catch (error) {
+                    // Try anonymous fallback, but catch quietly if disabled in Firebase console
+                    try {
+                        await signInAnonymously(auth);
+                    } catch (anonErr) {
+                        console.log("Anonymous auth is disabled in your project. User must sign in manually with Google.");
+                    }
+                }
             };
             initAuth();
 
@@ -324,17 +335,15 @@
                 const loggedOutUI = document.getElementById('loggedOutState');
                 
                 if (user && !user.isAnonymous) {
-                    // They are logged in with a real account (or Canvas token)
+                    // They are logged in
                     loggedOutUI.classList.add('hidden');
                     loggedInUI.classList.remove('hidden');
                     
-                    // Update UI with Google Profile Data
                     const displayName = user.displayName || `Creator_${user.uid.substring(0,5)}`;
                     document.getElementById('userAccountName').innerText = displayName;
                     
                     if (user.photoURL) {
                         document.getElementById('userAvatar').src = user.photoURL;
-                        // remove default gradient if they have a photo
                         document.getElementById('userAvatar').classList.remove('bg-gradient-to-r', 'from-purple-500', 'to-indigo-500');
                     }
                     
@@ -360,7 +369,12 @@
                 await signInWithPopup(auth, googleProvider);
             } catch (error) {
                 console.error("Login Failed", error);
-                window.showToast("Sign in failed. Check your connection.");
+                // Specifically warn if trying to log in from the preview window
+                if (error.code === 'auth/unauthorized-domain') {
+                    window.showToast("Please test on your live Vercel URL! This preview window is not authorized in Firebase.");
+                } else {
+                    window.showToast("Sign in failed. Check your connection.");
+                }
             }
         };
 
@@ -397,23 +411,37 @@
             });
         }
 
-        async function saveToDatabase(toolTitle, inputText, resultsArray) {
+        // NEW: Manual Save Single Result Function
+        window.saveSingleResult = async function(toolTitle, inputText, singleResultText, buttonElement) {
             if (!currentUser) {
-                window.showToast("Log in to save history!");
+                window.showToast("Please sign in to save items!");
                 return;
             }
+            
             try {
+                // Change icon to a spinner while it saves
+                buttonElement.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
+                
                 const historyRef = collection(db, 'artifacts', appId, 'users', currentUser.uid, 'history');
+                
                 await addDoc(historyRef, {
                     tool: toolTitle,
                     input: inputText,
-                    results: resultsArray,
+                    results: [singleResultText], // Saved as array to match history layout
                     timestamp: new Date().toISOString()
                 });
+                
+                // Show success checkmark
+                buttonElement.innerHTML = '<i class="fa-solid fa-check text-green-500"></i>';
+                buttonElement.disabled = true; // Prevent clicking it twice
+                window.showToast("Saved to History!");
+                
             } catch (e) {
                 console.error("Failed to save to history", e);
+                window.showToast("Error saving item.");
+                buttonElement.innerHTML = '<i class="fa-regular fa-bookmark"></i>';
             }
-        }
+        };
 
         // --- Export CSV Logic ---
         window.exportHistoryCSV = function() {
@@ -433,7 +461,7 @@
                 const safeTool = item.tool.replace(/"/g, '""');
                 const safeInput = item.input.replace(/"/g, '""');
                 
-                // Join the 3 bios/captions together with a bar | separator
+                // Join the results together (since some old ones might be arrays)
                 const combinedResults = item.results.join(" | ").replace(/"/g, '""');
                 
                 // Add row
@@ -565,7 +593,7 @@
 
             if (generationHistory.length === 0) {
                 emptyState.classList.remove('hidden');
-                emptyStateText.innerText = "No history yet. Start generating content!";
+                emptyStateText.innerText = "No history yet. Start generating content and click the save icon!";
                 return;
             }
 
@@ -637,7 +665,7 @@
                     responseMimeType: "application/json",
                     responseSchema: { type: "ARRAY", items: { type: "STRING" } }
                 }
-            }
+            };
 
             try {
                 const response = await fetch(API_URL, {
@@ -652,14 +680,8 @@
                 const rawText = data.candidates?.[0]?.content?.parts?.[0]?.text;
                 let resultsArray = JSON.parse(rawText);
                 
+                // NO MORE AUTO-SAVE. Render the results so user can manually save the good ones.
                 renderResults(resultsArray);
-                
-                // SAVE TO DATABASE (Only if logged in)
-                if(currentUser) {
-                    saveToDatabase(toolsConfig[currentTool].title, inputText, resultsArray);
-                } else {
-                    window.showToast("Sign in to save this automatically!");
-                }
 
             } catch (error) {
                 console.error("Error:", error);
@@ -675,6 +697,9 @@
 
         // --- 6. Helpers & UI Actions ---
         function renderResults(resultsArray) {
+            const currentInputText = mainInput.value.trim();
+            const currentToolTitle = toolsConfig[currentTool].title;
+
             resultsArray.forEach((text, index) => {
                 const card = document.createElement('div');
                 card.className = "result-card bg-white dark:bg-gray-800 p-5 rounded-xl border border-gray-100 dark:border-gray-700 shadow-sm relative group mb-4";
@@ -686,13 +711,27 @@
                     labelHtml = `<span class="inline-block px-2 py-1 rounded text-xs font-bold mb-2 ${labelColor}">${labelText}</span><br>`;
                 }
 
+                // Ensure data is escaped perfectly for insertion into HTML onClick attributes
+                const safeText = JSON.stringify(text).replace(/'/g, "&#39;").replace(/"/g, "&quot;");
+                const safeInput = JSON.stringify(currentInputText).replace(/'/g, "&#39;").replace(/"/g, "&quot;");
+                const safeTitle = JSON.stringify(currentToolTitle).replace(/"/g, "&quot;");
+
                 card.innerHTML = `
                     ${labelHtml}
-                    <p class="text-gray-700 dark:text-gray-200 text-sm whitespace-pre-wrap pr-8 leading-relaxed">${text}</p>
-                    <button onclick='window.copyToClipboard(${JSON.stringify(text).replace(/'/g, "&#39;")})' 
-                            class="absolute top-3 right-3 text-gray-400 hover:text-purple-600 dark:hover:text-purple-400 transition p-2 rounded-lg hover:bg-purple-50 dark:hover:bg-gray-700 opacity-0 group-hover:opacity-100">
-                        <i class="fa-regular fa-copy"></i>
-                    </button>
+                    <p class="text-gray-700 dark:text-gray-200 text-sm whitespace-pre-wrap pr-20 leading-relaxed">${text}</p>
+                    
+                    <div class="absolute top-3 right-3 flex gap-1 opacity-0 group-hover:opacity-100 focus-within:opacity-100 transition">
+                        <!-- Manual Save Button -->
+                        <button onclick='window.saveSingleResult(${safeTitle}, ${safeInput}, ${safeText}, this)' 
+                                class="text-gray-400 hover:text-blue-500 dark:hover:text-blue-400 transition p-2 rounded-lg hover:bg-blue-50 dark:hover:bg-gray-700" title="Save to History">
+                            <i class="fa-regular fa-bookmark"></i>
+                        </button>
+                        <!-- Copy Button -->
+                        <button onclick='window.copyToClipboard(${safeText})' 
+                                class="text-gray-400 hover:text-purple-600 dark:hover:text-purple-400 transition p-2 rounded-lg hover:bg-purple-50 dark:hover:bg-gray-700" title="Copy text">
+                            <i class="fa-regular fa-copy"></i>
+                        </button>
+                    </div>
                 `;
                 resultsContainer.appendChild(card);
             });
