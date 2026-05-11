@@ -655,7 +655,10 @@
                     // If we successfully found an Instagram/Twitter photo, show it with a cool green border
                     // We use onerror to fallback to their Google photo just in case the social photo fails to load
                     if (userSocialAvatar) {
-                        avatarHtml = `<img src="${userSocialAvatar}" onerror="this.src='${googlePhoto}'" class="w-12 h-12 rounded-full border-2 border-green-500 shadow-md object-cover bg-white">`;
+                        // Create a safe fallback image if unavatar.io is blocked by Instagram/X
+                        const fallbackImg = googlePhoto ? googlePhoto : 'https://ui-avatars.com/api/?name=Creator&background=random';
+                        
+                        avatarHtml = `<img src="${userSocialAvatar}" onerror="this.onerror=null; this.src='${fallbackImg}';" class="w-12 h-12 rounded-full border-2 border-green-500 shadow-md object-cover bg-white">`;
                         titleText = 'Social Profile Linked!';
                     } else if (googlePhoto) {
                         avatarHtml = `<img src="${googlePhoto}" class="w-10 h-10 rounded-full border-2 border-white dark:border-gray-700 shadow-sm object-cover">`;
@@ -782,19 +785,29 @@
 
         // --- 5. Generate Content API Call ---
         window.generateContent = async function() {
-            const inputText = mainInput.value.trim();
+            let inputText = mainInput.value.trim();
             const platform = document.getElementById('platformSelect').value;
             const tone = document.querySelector('input[name="tone"]:checked').value;
-
-            if (!inputText) {
-                window.showToast("Please enter some text first!");
-                return;
-            }
+            const config = toolsConfig[currentTool];
 
             // Intercept Profile Tool immediately
             if (currentTool === 'profile') {
+                if (!inputText) {
+                    window.showToast("Please enter your profile link or bio first!");
+                    return;
+                }
                 saveUserProfileContext(inputText);
                 return;
+            }
+
+            // Check if input is empty but allowed because of saved context
+            if (!inputText) {
+                if (config.optionalWithContext && userProfileContext) {
+                    inputText = "Generate this purely based on my saved Profile Context.";
+                } else {
+                    window.showToast("Please fill out the input box first!");
+                    return;
+                }
             }
 
             // UI Loading state
