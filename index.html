@@ -317,7 +317,8 @@
         
         let app, auth, db, currentUser = null;
         let generationHistory = [];
-        let userProfileContext = ""; // NEW: Stores user profile link/bio
+        let userProfileContext = ""; // Stores user profile link/bio
+        let userSocialAvatar = ""; // NEW: Stores the extracted social media avatar URL
 
         try {
             app = initializeApp(firebaseConfig);
@@ -371,6 +372,7 @@
                     loggedOutUI.classList.remove('hidden');
                     generationHistory = [];
                     userProfileContext = "";
+                    userSocialAvatar = ""; // Reset social avatar on logout
                     if (currentTool === 'history') renderHistoryList();
                 }
                 
@@ -438,10 +440,25 @@
                 const docSnap = await getDoc(profileDocRef);
                 if (docSnap.exists()) {
                     userProfileContext = docSnap.data().context || "";
+                    userSocialAvatar = docSnap.data().socialAvatar || ""; // Load avatar if it exists
                 }
+                updateDynamicToolUI();
             } catch (e) {
                 console.error("Error loading profile context", e);
             }
+        }
+
+        // NEW: Helper to find social media links and generate an avatar URL
+        function extractAvatarUrl(text) {
+            let match;
+            // Matches Instagram
+            if ((match = text.match(/instagram\.com\/([a-zA-Z0-9_.]+)/))) return `https://unavatar.io/instagram/${match[1]}`;
+            // Matches Twitter / X
+            if ((match = text.match(/(?:twitter\.com|x\.com)\/([a-zA-Z0-9_]+)/))) return `https://unavatar.io/twitter/${match[1]}`;
+            // Matches YouTube
+            if ((match = text.match(/youtube\.com\/@([a-zA-Z0-9_-]+)/))) return `https://unavatar.io/youtube/${match[1]}`;
+            
+            return null; // Return null if no recognized link is found
         }
 
         // NEW: Save Profile Context
@@ -451,10 +468,20 @@
                 return;
             }
             try {
+                const extractedAvatar = extractAvatarUrl(text) || ""; // Attempt to grab their photo
+
                 const profileDocRef = doc(db, 'artifacts', appId, 'users', currentUser.uid, 'settings', 'profile');
-                await setDoc(profileDocRef, { context: text, updatedAt: new Date().toISOString() }, { merge: true });
+                await setDoc(profileDocRef, { 
+                    context: text, 
+                    socialAvatar: extractedAvatar,
+                    updatedAt: new Date().toISOString() 
+                }, { merge: true });
+                
                 userProfileContext = text;
+                userSocialAvatar = extractedAvatar;
+                
                 window.showToast("Profile context saved!");
+                updateDynamicToolUI(); // Refresh the UI to show the new avatar
                 renderResults([`✅ Successfully saved your profile context:\n\n"${text}"\n\nAll tools will now use this to deeply personalize your content.`]);
             } catch (e) {
                 console.error("Error saving profile", e);
@@ -620,24 +647,31 @@
             if (currentTool === 'profile') {
                 dynamicUI.classList.remove('hidden');
                 if (currentUser && !currentUser.isAnonymous) {
-                    const photo = currentUser.photoURL || '';
-                    if (photo) {
-                        dynamicUI.innerHTML = `
-                            <div class="flex items-center gap-3 bg-white/50 dark:bg-gray-800/50 p-3 rounded-xl border border-gray-200 dark:border-gray-700 mt-2 shadow-sm">
-                                <img src="${photo}" class="w-10 h-10 rounded-full border-2 border-white dark:border-gray-700 shadow-sm object-cover">
-                                <div>
-                                    <p class="text-sm font-bold text-gray-800 dark:text-gray-200">Account Linked</p>
-                                    <p class="text-xs text-green-600 dark:text-green-400 font-medium"><i class="fa-solid fa-cloud-arrow-up mr-1"></i> Ready to save securely</p>
-                                </div>
-                            </div>
-                        `;
+                    const googlePhoto = currentUser.photoURL || '';
+                    
+                    let avatarHtml = '';
+                    let titleText = 'Account Linked';
+                    
+                    // If we successfully found an Instagram/Twitter photo, show it with a cool green border
+                    // We use onerror to fallback to their Google photo just in case the social photo fails to load
+                    if (userSocialAvatar) {
+                        avatarHtml = `<img src="${userSocialAvatar}" onerror="this.src='${googlePhoto}'" class="w-12 h-12 rounded-full border-2 border-green-500 shadow-md object-cover bg-white">`;
+                        titleText = 'Social Profile Linked!';
+                    } else if (googlePhoto) {
+                        avatarHtml = `<img src="${googlePhoto}" class="w-10 h-10 rounded-full border-2 border-white dark:border-gray-700 shadow-sm object-cover">`;
                     } else {
-                        dynamicUI.innerHTML = `
-                            <div class="p-3 bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400 text-sm rounded-lg border border-green-100 dark:border-green-800/30 font-medium">
-                                <i class="fa-solid fa-check-circle mr-2"></i> Logged in and ready to save.
-                            </div>
-                        `;
+                        avatarHtml = `<div class="w-10 h-10 rounded-full bg-gradient-to-r from-purple-500 to-indigo-500 flex items-center justify-center text-white"><i class="fa-solid fa-user"></i></div>`;
                     }
+
+                    dynamicUI.innerHTML = `
+                        <div class="flex items-center gap-4 bg-white/50 dark:bg-gray-800/50 p-4 rounded-xl border border-gray-200 dark:border-gray-700 mt-2 shadow-sm">
+                            ${avatarHtml}
+                            <div>
+                                <p class="text-sm font-bold text-gray-800 dark:text-gray-200">${titleText}</p>
+                                <p class="text-xs text-green-600 dark:text-green-400 font-medium mt-0.5"><i class="fa-solid fa-cloud-arrow-up mr-1"></i> Ready to personalize content</p>
+                            </div>
+                        </div>
+                    `;
                 } else {
                     dynamicUI.innerHTML = `
                         <div class="p-4 bg-amber-50 dark:bg-amber-900/20 text-amber-800 dark:text-amber-400 text-sm rounded-xl border border-amber-200 dark:border-amber-800/30 flex items-start gap-3 shadow-sm">
