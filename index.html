@@ -100,16 +100,28 @@
         
         <div class="flex-1 overflow-y-auto py-4 flex flex-col justify-between">
             <div>
+                <!-- NEW SETUP SECTION FOR PROFILE CONTEXT -->
+                <p class="px-6 text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-2">Setup</p>
+                <nav class="space-y-1 mb-6">
+                    <a href="#" onclick="switchTool('profile', event)" class="nav-item flex items-center gap-3 px-6 py-3 text-gray-600 dark:text-gray-300 hover:bg-white/50 dark:hover:bg-gray-800/50 transition">
+                        <i class="fa-solid fa-user-cog w-5 text-center text-green-500"></i> Profile Context
+                    </a>
+                </nav>
+
                 <p class="px-6 text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-2">Tools</p>
                 <nav class="space-y-1">
                     <a href="#" onclick="switchTool('bio', event)" class="nav-item active flex items-center gap-3 px-6 py-3 text-gray-600 dark:text-gray-300 hover:bg-white/50 dark:hover:bg-gray-800/50 transition">
-                        <i class="fa-regular fa-id-badge w-5 text-center"></i> Bio Generator
+                        <i class="fa-regular fa-id-badge w-5 text-center text-indigo-500"></i> Bio Generator
                     </a>
                     <a href="#" onclick="switchTool('caption', event)" class="nav-item flex items-center gap-3 px-6 py-3 text-gray-600 dark:text-gray-300 hover:bg-white/50 dark:hover:bg-gray-800/50 transition">
-                        <i class="fa-solid fa-pen-nib w-5 text-center"></i> Viral Captions
+                        <i class="fa-solid fa-pen-nib w-5 text-center text-pink-500"></i> Viral Captions
                     </a>
                     <a href="#" onclick="switchTool('hook', event)" class="nav-item flex items-center gap-3 px-6 py-3 text-gray-600 dark:text-gray-300 hover:bg-white/50 dark:hover:bg-gray-800/50 transition">
-                        <i class="fa-solid fa-magnet w-5 text-center"></i> Video Hooks
+                        <i class="fa-solid fa-magnet w-5 text-center text-yellow-500"></i> Video Hooks
+                    </a>
+                    <!-- NEW 7-DAY PLANNER LINK -->
+                    <a href="#" onclick="switchTool('planner', event)" class="nav-item flex items-center gap-3 px-6 py-3 text-gray-600 dark:text-gray-300 hover:bg-white/50 dark:hover:bg-gray-800/50 transition">
+                        <i class="fa-solid fa-calendar-week w-5 text-center text-blue-500"></i> 7-Day Planner
                     </a>
                     <a href="#" onclick="switchTool('roast', event)" class="nav-item flex items-center gap-3 px-6 py-3 text-gray-600 dark:text-gray-300 hover:bg-white/50 dark:hover:bg-gray-800/50 transition">
                         <i class="fa-solid fa-fire text-orange-500 w-5 text-center"></i> Roast My Profile
@@ -170,7 +182,7 @@
                 <div id="inputSection" class="w-full lg:w-1/2 p-6 md:p-8 bg-white/60 dark:bg-gray-800/40 flex flex-col border-r border-white/50 dark:border-gray-700/50 transition-colors">
                     <div class="mb-8">
                         <h2 id="toolTitle" class="text-3xl font-bold text-gray-800 dark:text-white flex items-center gap-2">
-                            <i id="toolIcon" class="fa-regular fa-id-badge text-purple-600 dark:text-purple-400"></i> 
+                            <i id="toolIcon" class="fa-regular fa-id-badge text-indigo-500 dark:text-indigo-400"></i> 
                             <span id="toolTitleText">Bio Generator</span>
                         </h2>
                         <p id="toolDesc" class="text-sm text-gray-500 dark:text-gray-400 mt-2">Generate the perfect social media bio in seconds.</p>
@@ -287,7 +299,7 @@
         // --- 1. Firebase Setup for Secure Accounts & Database ---
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInWithCustomToken, signInAnonymously, onAuthStateChanged, GoogleAuthProvider, signInWithPopup, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, addDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, onSnapshot, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         // Your real Firebase Configuration
         const firebaseConfig = {
@@ -303,6 +315,7 @@
         
         let app, auth, db, currentUser = null;
         let generationHistory = [];
+        let userProfileContext = ""; // NEW: Stores user profile link/bio
 
         try {
             app = initializeApp(firebaseConfig);
@@ -347,6 +360,7 @@
                         document.getElementById('userAvatar').classList.remove('bg-gradient-to-r', 'from-purple-500', 'to-indigo-500');
                     }
                     
+                    loadUserProfile(); // NEW: Load profile context automatically
                     setupHistoryListener(); // Fetch their database history
                     
                 } else {
@@ -354,6 +368,7 @@
                     loggedInUI.classList.add('hidden');
                     loggedOutUI.classList.remove('hidden');
                     generationHistory = [];
+                    userProfileContext = "";
                     if (currentTool === 'history') renderHistoryList();
                 }
             });
@@ -369,7 +384,6 @@
                 await signInWithPopup(auth, googleProvider);
             } catch (error) {
                 console.error("Login Failed", error);
-                // Specifically warn if trying to log in from the preview window
                 if (error.code === 'auth/unauthorized-domain') {
                     window.showToast("Please test on your live Vercel URL! This preview window is not authorized in Firebase.");
                 } else {
@@ -411,7 +425,39 @@
             });
         }
 
-        // NEW: Manual Save Single Result Function
+        // NEW: Load Profile Context
+        async function loadUserProfile() {
+            if (!currentUser) return;
+            try {
+                const profileDocRef = doc(db, 'artifacts', appId, 'users', currentUser.uid, 'settings', 'profile');
+                const docSnap = await getDoc(profileDocRef);
+                if (docSnap.exists()) {
+                    userProfileContext = docSnap.data().context || "";
+                }
+            } catch (e) {
+                console.error("Error loading profile context", e);
+            }
+        }
+
+        // NEW: Save Profile Context
+        async function saveUserProfileContext(text) {
+            if (!currentUser) {
+                window.showToast("Please sign in to save your profile!");
+                return;
+            }
+            try {
+                const profileDocRef = doc(db, 'artifacts', appId, 'users', currentUser.uid, 'settings', 'profile');
+                await setDoc(profileDocRef, { context: text, updatedAt: new Date().toISOString() }, { merge: true });
+                userProfileContext = text;
+                window.showToast("Profile context saved!");
+                renderResults([`✅ Successfully saved your profile context:\n\n"${text}"\n\nAll tools will now use this to deeply personalize your content.`]);
+            } catch (e) {
+                console.error("Error saving profile", e);
+                window.showToast("Error saving profile.");
+            }
+        }
+
+        // Manual Save Single Result Function
         window.saveSingleResult = async function(toolTitle, inputText, singleResultText, buttonElement) {
             if (!currentUser) {
                 window.showToast("Please sign in to save items!");
@@ -494,38 +540,60 @@
             bio: {
                 title: "Bio Generator",
                 desc: "Generate the perfect social media bio in seconds.",
-                icon: "fa-id-badge",
+                icon: "fa-regular fa-id-badge text-indigo-500 dark:text-indigo-400",
                 inputLabel: "Tell us about yourself",
                 placeholder: "e.g. Fitness coach, love pizza, helping moms get strong...",
-                showOptions: true
+                showOptions: true,
+                btnText: "Generate Bios"
             },
             caption: {
                 title: "Viral Captions",
                 desc: "Write engaging captions with emojis and hashtags.",
-                icon: "fa-pen-nib",
+                icon: "fa-solid fa-pen-nib text-pink-500 dark:text-pink-400",
                 inputLabel: "What is this post/photo about?",
                 placeholder: "e.g. A photo of my cat sleeping on my laptop keyboard.",
-                showOptions: true
+                showOptions: true,
+                btnText: "Write Captions"
             },
             hook: {
                 title: "Video Hooks",
                 desc: "Stop the scroll with 5 catchy opening lines for TikTok/Reels.",
-                icon: "fa-magnet",
+                icon: "fa-solid fa-magnet text-yellow-500 dark:text-yellow-400",
                 inputLabel: "What is your video about?",
                 placeholder: "e.g. 3 ways to organize your desk for maximum productivity.",
-                showOptions: false
+                showOptions: false,
+                btnText: "Generate Hooks"
+            },
+            planner: {
+                title: "7-Day Content Planner",
+                desc: "Beat writer's block with a full week of highly engaging video ideas.",
+                icon: "fa-solid fa-calendar-week text-blue-500 dark:text-blue-400",
+                inputLabel: "What is your niche or topic?",
+                placeholder: "e.g. Real estate tips, budget travel, easy healthy recipes...",
+                showOptions: true,
+                btnText: "Generate Planner"
             },
             roast: {
                 title: "Roast My Profile",
                 desc: "Get playfully roasted, then get an improved version.",
-                icon: "fa-fire",
+                icon: "fa-solid fa-fire text-orange-500 dark:text-orange-400",
                 inputLabel: "Paste your current bio or profile link here:",
                 placeholder: "e.g. 'Just a guy trying to make it in the world.'",
-                showOptions: false
+                showOptions: false,
+                btnText: "Roast Me"
+            },
+            profile: {
+                title: "Profile Context",
+                desc: "Save your social media link or base bio. The AI will use it to personalize everything.",
+                icon: "fa-solid fa-user-cog text-green-500 dark:text-green-400",
+                inputLabel: "Your Profile Link or Base Bio",
+                placeholder: "https://www.tiktok.com/@username OR 'I'm a tech reviewer in NYC...'",
+                showOptions: false,
+                btnText: "Save Context"
             },
             history: {
                 title: "My History",
-                icon: "fa-clock-rotate-left"
+                icon: "fa-solid fa-clock-rotate-left text-gray-500 dark:text-gray-400"
             }
         };
 
@@ -566,9 +634,10 @@
                 
                 document.getElementById('toolTitleText').innerText = config.title;
                 document.getElementById('toolDesc').innerText = config.desc;
-                document.getElementById('toolIcon').className = `fa-solid ${config.icon} text-purple-600 dark:text-purple-400`;
+                document.getElementById('toolIcon').className = config.icon;
                 document.getElementById('mainInputLabel').innerText = config.inputLabel;
                 mainInput.placeholder = config.placeholder;
+                document.getElementById('btnText').innerText = config.btnText || "Generate Content";
                 
                 document.getElementById('rightSideTitle').innerText = "Results";
                 document.getElementById('clearBtn').classList.remove('hidden');
@@ -576,6 +645,10 @@
                 
                 optionsSection.classList.toggle('hidden', !config.showOptions);
                 window.clearResults();
+
+                if (toolKey === 'profile' && userProfileContext) {
+                    mainInput.value = userProfileContext;
+                }
             }
 
             toggleMobileMenu(true); 
@@ -606,7 +679,7 @@
                 
                 let resultsHtml = item.results.map(res => 
                     `<div class="bg-gray-50 dark:bg-gray-700/50 p-3 rounded-lg text-sm text-gray-700 dark:text-gray-300 mb-2 relative group">
-                        <p class="pr-6">${res}</p>
+                        <p class="pr-6 whitespace-pre-wrap">${res}</p>
                         <button onclick='window.copyToClipboard(${JSON.stringify(res).replace(/'/g, "&#39;")})' class="absolute top-2 right-2 text-gray-400 hover:text-purple-500 opacity-0 group-hover:opacity-100 transition"><i class="fa-regular fa-copy"></i></button>
                     </div>`
                 ).join('');
@@ -636,6 +709,12 @@
                 return;
             }
 
+            // Intercept Profile Tool immediately
+            if (currentTool === 'profile') {
+                saveUserProfileContext(inputText);
+                return;
+            }
+
             // UI Loading state
             emptyState.classList.add('hidden');
             Array.from(resultsContainer.querySelectorAll('.result-card')).forEach(el => el.remove());
@@ -656,6 +735,13 @@
                 systemPrompt = `You are a TikTok producer. Generate EXACTLY 5 scroll-stopping opening verbal hooks (1-2 sentences each) for the video topic. Format strictly as a JSON array of strings.`;
             } else if (currentTool === 'roast') {
                 systemPrompt = `You are a comedian. Item 1: A sarcastic roast of their bio. Item 2: A professional rewrite of their bio. Format strictly as a JSON array of exactly 2 strings.`;
+            } else if (currentTool === 'planner') {
+                systemPrompt = `You are a master content strategist. The user will provide their niche/topic. Generate a 7-day viral content calendar for ${platform} in a ${tone} tone. Return EXACTLY 7 items. Each item must be a single string representing one day, formatted exactly like this:\n\n📅 Day 1: [Catchy Video Title]\n💡 Hook: [The first 3 seconds of script]\n🎬 Concept: [1-2 sentences explaining the video]\n\nFormat strictly as a JSON array of 7 strings.`;
+            }
+
+            // Apply global profile context if it exists
+            if (userProfileContext) {
+                systemPrompt += `\n\nCRITICAL CONTEXT: Deeply personalize the results using this background information/link about the user: "${userProfileContext}". Integrate this persona naturally into the generated content.`;
             }
 
             const payload = {
@@ -680,7 +766,7 @@
                 const rawText = data.candidates?.[0]?.content?.parts?.[0]?.text;
                 let resultsArray = JSON.parse(rawText);
                 
-                // NO MORE AUTO-SAVE. Render the results so user can manually save the good ones.
+                // Render the results so user can manually save the good ones.
                 renderResults(resultsArray);
 
             } catch (error) {
@@ -716,16 +802,23 @@
                 const safeInput = JSON.stringify(currentInputText).replace(/'/g, "&#39;").replace(/"/g, "&quot;");
                 const safeTitle = JSON.stringify(currentToolTitle).replace(/"/g, "&quot;");
 
-                card.innerHTML = `
-                    ${labelHtml}
-                    <p class="text-gray-700 dark:text-gray-200 text-sm whitespace-pre-wrap pr-20 leading-relaxed">${text}</p>
-                    
-                    <div class="absolute top-3 right-3 flex gap-1 opacity-0 group-hover:opacity-100 focus-within:opacity-100 transition">
+                let saveButtonHtml = "";
+                if (currentTool !== 'profile') {
+                    saveButtonHtml = `
                         <!-- Manual Save Button -->
                         <button onclick='window.saveSingleResult(${safeTitle}, ${safeInput}, ${safeText}, this)' 
                                 class="text-gray-400 hover:text-blue-500 dark:hover:text-blue-400 transition p-2 rounded-lg hover:bg-blue-50 dark:hover:bg-gray-700" title="Save to History">
                             <i class="fa-regular fa-bookmark"></i>
                         </button>
+                    `;
+                }
+
+                card.innerHTML = `
+                    ${labelHtml}
+                    <p class="text-gray-700 dark:text-gray-200 text-sm whitespace-pre-wrap pr-20 leading-relaxed">${text}</p>
+                    
+                    <div class="absolute top-3 right-3 flex gap-1 opacity-0 group-hover:opacity-100 focus-within:opacity-100 transition">
+                        ${saveButtonHtml}
                         <!-- Copy Button -->
                         <button onclick='window.copyToClipboard(${safeText})' 
                                 class="text-gray-400 hover:text-purple-600 dark:hover:text-purple-400 transition p-2 rounded-lg hover:bg-purple-50 dark:hover:bg-gray-700" title="Copy text">
