@@ -186,6 +186,8 @@
                             <span id="toolTitleText">Bio Generator</span>
                         </h2>
                         <p id="toolDesc" class="text-sm text-gray-500 dark:text-gray-400 mt-2">Generate the perfect social media bio in seconds.</p>
+                        <!-- NEW DYNAMIC UI CONTAINER FOR WARNINGS/PROFILE PICS -->
+                        <div id="dynamicToolUI" class="mt-4 hidden transition-all duration-300"></div>
                     </div>
 
                     <div class="space-y-5 flex-1">
@@ -360,7 +362,7 @@
                         document.getElementById('userAvatar').classList.remove('bg-gradient-to-r', 'from-purple-500', 'to-indigo-500');
                     }
                     
-                    loadUserProfile(); // NEW: Load profile context automatically
+                    loadUserProfile(); // Load profile context automatically
                     setupHistoryListener(); // Fetch their database history
                     
                 } else {
@@ -371,6 +373,9 @@
                     userProfileContext = "";
                     if (currentTool === 'history') renderHistoryList();
                 }
+                
+                // Update dynamic UI for currently selected tool (in case they login/logout while viewing it)
+                updateDynamicToolUI();
             });
         } catch (error) {
             console.warn("Firebase running in offline/demo mode.", error);
@@ -607,6 +612,48 @@
         const inputSection = document.getElementById('inputSection');
         const outputSection = document.getElementById('outputSection');
 
+        // NEW: Dynamic UI Updater for Profile Context Tool
+        function updateDynamicToolUI() {
+            const dynamicUI = document.getElementById('dynamicToolUI');
+            dynamicUI.innerHTML = ''; 
+
+            if (currentTool === 'profile') {
+                dynamicUI.classList.remove('hidden');
+                if (currentUser && !currentUser.isAnonymous) {
+                    const photo = currentUser.photoURL || '';
+                    if (photo) {
+                        dynamicUI.innerHTML = `
+                            <div class="flex items-center gap-3 bg-white/50 dark:bg-gray-800/50 p-3 rounded-xl border border-gray-200 dark:border-gray-700 mt-2 shadow-sm">
+                                <img src="${photo}" class="w-10 h-10 rounded-full border-2 border-white dark:border-gray-700 shadow-sm object-cover">
+                                <div>
+                                    <p class="text-sm font-bold text-gray-800 dark:text-gray-200">Account Linked</p>
+                                    <p class="text-xs text-green-600 dark:text-green-400 font-medium"><i class="fa-solid fa-cloud-arrow-up mr-1"></i> Ready to save securely</p>
+                                </div>
+                            </div>
+                        `;
+                    } else {
+                        dynamicUI.innerHTML = `
+                            <div class="p-3 bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400 text-sm rounded-lg border border-green-100 dark:border-green-800/30 font-medium">
+                                <i class="fa-solid fa-check-circle mr-2"></i> Logged in and ready to save.
+                            </div>
+                        `;
+                    }
+                } else {
+                    dynamicUI.innerHTML = `
+                        <div class="p-4 bg-amber-50 dark:bg-amber-900/20 text-amber-800 dark:text-amber-400 text-sm rounded-xl border border-amber-200 dark:border-amber-800/30 flex items-start gap-3 shadow-sm">
+                            <i class="fa-solid fa-triangle-exclamation mt-0.5 text-amber-500 text-lg"></i>
+                            <div>
+                                <p class="font-bold mb-1">Wait! You are not signed in.</p>
+                                <p class="text-xs opacity-90 leading-relaxed">Please sign in with Google using the sidebar menu before saving your context, otherwise your profile will not be saved.</p>
+                            </div>
+                        </div>
+                    `;
+                }
+            } else {
+                dynamicUI.classList.add('hidden');
+            }
+        }
+
         window.switchTool = function(toolKey, event) {
             if(event) event.preventDefault();
             currentTool = toolKey;
@@ -651,6 +698,7 @@
                 }
             }
 
+            updateDynamicToolUI(); // Update the warnings/photos when switching tools
             toggleMobileMenu(true); 
         };
 
