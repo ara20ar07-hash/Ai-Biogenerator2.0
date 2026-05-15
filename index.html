@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" class="light">
+<html lang="en" class="light" dir="ltr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -12,7 +12,7 @@
     <meta name="keywords" content="AI creator tools, TikTok hook generator, Instagram bio generator, AI caption writer, social media growth, AI for creators">
     <meta name="author" content="CreatorKit">
 
-    <!-- Open Graph / Facebook (How it looks when shared on social media) -->
+    <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://creatorkitpro.vercel.app/">
     <meta property="og:title" content="CreatorKit Pro | AI Tools for Social Media Growth">
@@ -37,7 +37,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
-            darkMode: 'class', // Enable class-based dark mode
+            darkMode: 'class', 
         }
     </script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet">
@@ -66,9 +66,12 @@
         .dark ::-webkit-scrollbar-thumb:hover { background: #64748b; }
         
         /* Active Nav Item */
+        /* Note: RTL changes borders logically */
+        [dir="ltr"] .nav-item.active { border-right: 4px solid #7c3aed; }
+        [dir="rtl"] .nav-item.active { border-left: 4px solid #7c3aed; }
+        
         .nav-item.active {
             background: linear-gradient(to right, #f3e8ff, #e0e7ff);
-            border-right: 4px solid #7c3aed;
             color: #6d28d9;
             font-weight: 600;
         }
@@ -86,6 +89,7 @@
             <i class="fa-solid fa-bolt text-purple-600 dark:text-purple-400"></i> CreatorKit
         </h1>
         <div class="flex items-center gap-4">
+            <button onclick="toggleLanguage()" class="text-gray-600 dark:text-gray-300 text-sm font-bold border border-gray-300 dark:border-gray-600 px-2 rounded hover:bg-gray-100 dark:hover:bg-gray-800 transition" id="mobileLangBtn">KU</button>
             <button onclick="toggleTheme()" class="text-gray-600 dark:text-gray-300 text-xl"><i id="mobileThemeIcon" class="fa-solid fa-moon"></i></button>
             <button id="mobileMenuBtn" class="text-gray-600 dark:text-gray-300 text-2xl"><i class="fa-solid fa-bars"></i></button>
         </div>
@@ -94,79 +98,75 @@
     <!-- Sidebar Navigation -->
     <div id="sidebar" class="w-64 glass-panel border-r border-white/50 dark:border-gray-700/50 flex-shrink-0 flex flex-col absolute md:relative z-40 h-full transform -translate-x-full md:translate-x-0 transition-transform duration-300">
         <div class="p-6 hidden md:block border-b border-gray-200/50 dark:border-gray-700/50">
-            <h1 class="text-2xl font-bold text-gray-800 dark:text-white flex items-center gap-2">
-                <i class="fa-solid fa-layer-group text-purple-600 dark:text-purple-400"></i> CreatorKit
+            <h1 class="text-2xl font-bold text-gray-800 dark:text-white flex items-center justify-between gap-2">
+                <span class="flex items-center gap-2"><i class="fa-solid fa-layer-group text-purple-600 dark:text-purple-400"></i> CreatorKit</span>
+                <button onclick="toggleLanguage()" class="text-xs font-bold border border-gray-300 dark:border-gray-600 text-gray-600 dark:text-gray-300 px-2 py-1 rounded hover:bg-gray-100 dark:hover:bg-gray-800 transition shadow-sm" id="desktopLangBtn">کوردی / KU</button>
             </h1>
         </div>
         
         <div class="flex-1 overflow-y-auto py-4 flex flex-col justify-between">
             <div>
-                <!-- SETUP SECTION FOR PROFILE CONTEXT -->
-                <p class="px-6 text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-2">Setup</p>
+                <!-- SETUP SECTION -->
+                <p id="t_setup" class="px-6 text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-2">Setup</p>
                 <nav class="space-y-1 mb-6">
                     <a href="#" onclick="switchTool('profile', event)" class="nav-item flex items-center gap-3 px-6 py-3 text-gray-600 dark:text-gray-300 hover:bg-white/50 dark:hover:bg-gray-800/50 transition">
-                        <i class="fa-solid fa-user-cog w-5 text-center text-green-500"></i> Profile Context
+                        <i class="fa-solid fa-user-cog w-5 text-center text-green-500"></i> <span id="t_navProfile">Profile Context</span>
                     </a>
                 </nav>
 
-                <p class="px-6 text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-2">Tools</p>
+                <p id="t_tools" class="px-6 text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-2">Tools</p>
                 <nav class="space-y-1">
                     <a href="#" onclick="switchTool('bio', event)" class="nav-item active flex items-center gap-3 px-6 py-3 text-gray-600 dark:text-gray-300 hover:bg-white/50 dark:hover:bg-gray-800/50 transition">
-                        <i class="fa-regular fa-id-badge w-5 text-center text-indigo-500"></i> Bio Generator
+                        <i class="fa-regular fa-id-badge w-5 text-center text-indigo-500"></i> <span id="t_navBio">Bio Generator</span>
                     </a>
                     <a href="#" onclick="switchTool('caption', event)" class="nav-item flex items-center gap-3 px-6 py-3 text-gray-600 dark:text-gray-300 hover:bg-white/50 dark:hover:bg-gray-800/50 transition">
-                        <i class="fa-solid fa-pen-nib w-5 text-center text-pink-500"></i> Viral Captions
+                        <i class="fa-solid fa-pen-nib w-5 text-center text-pink-500"></i> <span id="t_navCaption">Viral Captions</span>
                     </a>
                     <a href="#" onclick="switchTool('hook', event)" class="nav-item flex items-center gap-3 px-6 py-3 text-gray-600 dark:text-gray-300 hover:bg-white/50 dark:hover:bg-gray-800/50 transition">
-                        <i class="fa-solid fa-magnet w-5 text-center text-yellow-500"></i> Video Hooks
+                        <i class="fa-solid fa-magnet w-5 text-center text-yellow-500"></i> <span id="t_navHook">Video Hooks</span>
                     </a>
-                    <!-- 7-DAY PLANNER LINK -->
                     <a href="#" onclick="switchTool('planner', event)" class="nav-item flex items-center gap-3 px-6 py-3 text-gray-600 dark:text-gray-300 hover:bg-white/50 dark:hover:bg-gray-800/50 transition">
-                        <i class="fa-solid fa-calendar-week w-5 text-center text-blue-500"></i> 7-Day Planner
+                        <i class="fa-solid fa-calendar-week w-5 text-center text-blue-500"></i> <span id="t_navPlanner">7-Day Planner</span>
                     </a>
                     <a href="#" onclick="switchTool('roast', event)" class="nav-item flex items-center gap-3 px-6 py-3 text-gray-600 dark:text-gray-300 hover:bg-white/50 dark:hover:bg-gray-800/50 transition">
-                        <i class="fa-solid fa-fire text-orange-500 w-5 text-center"></i> Roast My Profile
+                        <i class="fa-solid fa-fire text-orange-500 w-5 text-center"></i> <span id="t_navRoast">Roast My Profile</span>
                     </a>
                 </nav>
 
-                <p class="px-6 text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider mt-8 mb-2">Account</p>
+                <p id="t_account" class="px-6 text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider mt-8 mb-2">Account</p>
                 <nav class="space-y-1">
                     <a href="#" onclick="switchTool('history', event)" class="nav-item flex items-center gap-3 px-6 py-3 text-gray-600 dark:text-gray-300 hover:bg-white/50 dark:hover:bg-gray-800/50 transition">
-                        <i class="fa-solid fa-clock-rotate-left w-5 text-center text-gray-500"></i> My History
+                        <i class="fa-solid fa-clock-rotate-left w-5 text-center text-gray-500"></i> <span id="t_navHistory">My History</span>
                     </a>
                     <button onclick="toggleTheme()" class="w-full flex items-center gap-3 px-6 py-3 text-gray-600 dark:text-gray-300 hover:bg-white/50 dark:hover:bg-gray-800/50 transition text-left">
-                        <i id="desktopThemeIcon" class="fa-solid fa-moon w-5 text-center"></i> Dark Mode
+                        <i id="desktopThemeIcon" class="fa-solid fa-moon w-5 text-center"></i> <span id="t_navDark">Dark Mode</span>
                     </button>
                 </nav>
             </div>
             
             <!-- User Authentication Section -->
             <div class="px-6 py-4 mt-auto border-t border-gray-200/50 dark:border-gray-700/50">
-                
-                <!-- State 1: Logged In (Hidden by default) -->
                 <div id="loggedInState" class="hidden flex items-center justify-between">
                     <div class="flex items-center gap-3">
                         <img id="userAvatar" src="" class="w-8 h-8 rounded-full bg-gradient-to-r from-purple-500 to-indigo-500 flex items-center justify-center text-white object-cover shadow-sm">
                         <div class="overflow-hidden">
                             <p class="text-sm font-semibold text-gray-800 dark:text-gray-200 truncate w-24" id="userAccountName">Creator</p>
-                            <button onclick="handleSignOut()" class="text-xs text-red-500 hover:text-red-600 dark:text-red-400 font-medium transition">Sign Out</button>
+                            <button onclick="handleSignOut()" id="t_btnSignOut" class="text-xs text-red-500 hover:text-red-600 dark:text-red-400 font-medium transition">Sign Out</button>
                         </div>
                     </div>
                 </div>
 
-                <!-- State 2: Logged Out (Visible by default) -->
                 <div id="loggedOutState" class="block">
                     <button onclick="signInWithGoogle()" class="w-full flex items-center justify-center gap-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-200 text-sm font-semibold py-2 px-4 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition shadow-sm">
-                        <!-- Google SVG Icon -->
                         <svg class="w-4 h-4" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                             <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
                             <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
                             <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
                             <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
                         </svg>
-                        Sign in
+                        <span id="t_btnSignIn">Sign in</span>
                     </button>
-                    <p class="text-[10px] text-gray-400 dark:text-gray-500 text-center mt-2">Sync history across devices</p>
+                    <p id="t_syncText" class="text-[10px] text-gray-400 dark:text-gray-500 text-center mt-2">Sync history across devices</p>
                 </div>
             </div>
         </div>
@@ -179,7 +179,7 @@
         <div class="flex-1 overflow-y-auto p-4 md:p-8">
             <div class="max-w-5xl mx-auto glass-panel rounded-3xl shadow-xl overflow-hidden flex flex-col lg:flex-row min-h-[700px]">
                 
-                <!-- Left Side: Dynamic Input Form (Hidden on History Tab) -->
+                <!-- Left Side: Dynamic Input Form -->
                 <div id="inputSection" class="w-full lg:w-1/2 p-6 md:p-8 bg-white/60 dark:bg-gray-800/40 flex flex-col border-r border-white/50 dark:border-gray-700/50 transition-colors">
                     <div class="mb-8">
                         <h2 id="toolTitle" class="text-3xl font-bold text-gray-800 dark:text-white flex items-center gap-2">
@@ -187,22 +187,18 @@
                             <span id="toolTitleText">Bio Generator</span>
                         </h2>
                         <p id="toolDesc" class="text-sm text-gray-500 dark:text-gray-400 mt-2">Generate the perfect social media bio in seconds.</p>
-                        <!-- DYNAMIC UI CONTAINER FOR WARNINGS/PROFILE PICS -->
                         <div id="dynamicToolUI" class="mt-4 hidden transition-all duration-300"></div>
                     </div>
 
                     <div class="space-y-5 flex-1">
-                        <!-- Main Text Input -->
                         <div>
                             <label id="mainInputLabel" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Tell us about yourself</label>
                             <textarea id="mainInput" rows="3" placeholder="e.g. Fitness coach, love pizza, helping moms get strong..." class="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-600 focus:border-purple-500 focus:ring-2 focus:ring-purple-200 dark:focus:ring-purple-900 transition outline-none bg-white/80 dark:bg-gray-700/80 dark:text-white resize-none"></textarea>
                         </div>
 
-                        <!-- Options Section -->
                         <div id="optionsSection" class="space-y-5">
-                            <!-- Platform Dropdown -->
                             <div id="platformContainer">
-                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Platform</label>
+                                <label id="t_labelPlatform" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Platform</label>
                                 <div class="relative">
                                     <div id="platformSelectBtn" class="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-600 focus:border-purple-500 focus:ring-2 focus:ring-purple-200 dark:focus:ring-purple-900 transition outline-none bg-white/80 dark:bg-gray-700/80 dark:text-white cursor-pointer flex items-center justify-between shadow-sm">
                                         <div id="selectedPlatformDisplay" class="flex items-center gap-3 font-medium text-gray-700 dark:text-gray-200">
@@ -210,8 +206,6 @@
                                         </div>
                                         <i class="fa-solid fa-chevron-down text-gray-400 text-sm"></i>
                                     </div>
-                                    
-                                    <!-- The hidden menu -->
                                     <div id="platformDropdownMenu" class="hidden absolute z-20 w-full mt-2 bg-white dark:bg-gray-800 rounded-xl shadow-xl border border-gray-100 dark:border-gray-700 overflow-hidden">
                                         <div class="platform-option p-3 hover:bg-purple-50 dark:hover:bg-gray-700 cursor-pointer flex items-center gap-3 transition font-medium text-gray-700 dark:text-gray-200" data-value="Instagram">
                                             <i class="fa-brands fa-instagram text-pink-600 text-lg w-5 text-center"></i> Instagram
@@ -230,21 +224,20 @@
                                 <input type="hidden" id="platformSelect" value="Instagram">
                             </div>
 
-                            <!-- Tone Selector -->
                             <div id="toneContainer">
-                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Tone</label>
+                                <label id="t_labelTone" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Tone</label>
                                 <div class="grid grid-cols-3 gap-2">
                                     <label class="cursor-pointer">
                                         <input type="radio" name="tone" value="Professional" class="peer sr-only" checked>
-                                        <div class="text-center px-2 py-2 rounded-lg border border-gray-200 dark:border-gray-600 dark:text-gray-300 peer-checked:bg-purple-100 dark:peer-checked:bg-purple-900/50 peer-checked:border-purple-500 peer-checked:text-purple-700 dark:peer-checked:text-purple-300 text-sm transition font-medium">Pro</div>
+                                        <div id="t_tonePro" class="text-center px-2 py-2 rounded-lg border border-gray-200 dark:border-gray-600 dark:text-gray-300 peer-checked:bg-purple-100 dark:peer-checked:bg-purple-900/50 peer-checked:border-purple-500 peer-checked:text-purple-700 dark:peer-checked:text-purple-300 text-sm transition font-medium">Pro</div>
                                     </label>
                                     <label class="cursor-pointer">
                                         <input type="radio" name="tone" value="Casual & Fun" class="peer sr-only">
-                                        <div class="text-center px-2 py-2 rounded-lg border border-gray-200 dark:border-gray-600 dark:text-gray-300 peer-checked:bg-purple-100 dark:peer-checked:bg-purple-900/50 peer-checked:border-purple-500 peer-checked:text-purple-700 dark:peer-checked:text-purple-300 text-sm transition font-medium">Fun</div>
+                                        <div id="t_toneFun" class="text-center px-2 py-2 rounded-lg border border-gray-200 dark:border-gray-600 dark:text-gray-300 peer-checked:bg-purple-100 dark:peer-checked:bg-purple-900/50 peer-checked:border-purple-500 peer-checked:text-purple-700 dark:peer-checked:text-purple-300 text-sm transition font-medium">Fun</div>
                                     </label>
                                     <label class="cursor-pointer">
                                         <input type="radio" name="tone" value="Edgy & Witty" class="peer sr-only">
-                                        <div class="text-center px-2 py-2 rounded-lg border border-gray-200 dark:border-gray-600 dark:text-gray-300 peer-checked:bg-purple-100 dark:peer-checked:bg-purple-900/50 peer-checked:border-purple-500 peer-checked:text-purple-700 dark:peer-checked:text-purple-300 text-sm transition font-medium">Edgy</div>
+                                        <div id="t_toneEdgy" class="text-center px-2 py-2 rounded-lg border border-gray-200 dark:border-gray-600 dark:text-gray-300 peer-checked:bg-purple-100 dark:peer-checked:bg-purple-900/50 peer-checked:border-purple-500 peer-checked:text-purple-700 dark:peer-checked:text-purple-300 text-sm transition font-medium">Edgy</div>
                                     </label>
                                 </div>
                             </div>
@@ -263,32 +256,27 @@
                         <h2 id="rightSideTitle" class="text-lg font-semibold text-gray-800 dark:text-gray-100">Results</h2>
                         
                         <div class="flex items-center gap-4">
-                            <!-- New Export to CSV Button (Hidden by default, shown on History tab) -->
                             <button id="exportCsvBtn" onclick="exportHistoryCSV()" class="hidden text-xs text-green-600 dark:text-green-400 hover:text-green-700 dark:hover:text-green-300 transition font-medium">
-                                <i class="fa-solid fa-file-csv"></i> Export CSV
+                                <i class="fa-solid fa-file-csv"></i> <span id="t_btnExport">Export CSV</span>
                             </button>
-                            <!-- Clear Button -->
                             <button id="clearBtn" onclick="clearResults()" class="text-xs text-gray-500 dark:text-gray-400 hover:text-red-500 dark:hover:text-red-400 transition">
-                                <i class="fa-solid fa-trash"></i> Clear
+                                <i class="fa-solid fa-trash"></i> <span id="t_btnClear">Clear</span>
                             </button>
                         </div>
                     </div>
                     
                     <div id="resultsContainer" class="flex-1 overflow-y-auto space-y-4 pr-2">
-                        <!-- Empty State -->
                         <div id="emptyState" class="h-full flex flex-col items-center justify-center text-gray-400 dark:text-gray-500">
                             <i class="fa-regular fa-paper-plane text-5xl mb-3 opacity-50"></i>
                             <p id="emptyStateText" class="text-sm text-center px-4">Select a tool, fill out the details, and let AI do the magic.</p>
                         </div>
 
-                        <!-- Loading State -->
                         <div id="loadingState" class="hidden h-full flex flex-col items-center justify-center text-purple-600 dark:text-purple-400">
                             <i class="fa-solid fa-circle-notch fa-spin text-4xl mb-3"></i>
-                            <p class="text-sm font-medium animate-pulse">Crafting AI magic...</p>
+                            <p id="t_loading" class="text-sm font-medium animate-pulse">Crafting AI magic...</p>
                         </div>
                     </div>
 
-                    <!-- Toast Notification -->
                     <div id="toast" class="absolute bottom-6 left-1/2 transform -translate-x-1/2 bg-gray-800 dark:bg-white text-white dark:text-gray-900 px-4 py-2 rounded-lg text-sm shadow-lg transition-opacity duration-300 opacity-0 pointer-events-none z-50">
                         Copied to clipboard!
                     </div>
@@ -297,14 +285,109 @@
         </div>
     </div>
 
-    <!-- Main Logic & Firebase Integration -->
     <script type="module">
+        // --- 0. TRANSLATION ENGINE & RTL SETUP ---
+        let currentLang = 'en';
+        
+        const dictionary = {
+            en: {
+                setup: "Setup", navProfile: "Profile Context",
+                tools: "Tools", navBio: "Bio Generator", navCaption: "Viral Captions", navHook: "Video Hooks", navPlanner: "7-Day Planner", navRoast: "Roast My Profile",
+                account: "Account", navHistory: "My History", navDark: "Dark Mode",
+                btnSignOut: "Sign Out", btnSignIn: "Sign in", syncText: "Sync history across devices",
+                labelPlatform: "Platform", labelTone: "Tone", tonePro: "Pro", toneFun: "Fun", toneEdgy: "Edgy",
+                btnExport: "Export CSV", btnClear: "Clear",
+                emptyDefault: "Select a tool, fill out the details, and let AI do the magic.",
+                emptyLogin: "Please sign in to view your history.",
+                emptyHistory: "No history yet. Start generating content and click the save icon!",
+                loading: "Crafting AI magic...", toastCopy: "Copied to clipboard!",
+                titleResults: "Results", titleHistory: "Saved Generations",
+                // Tool Config Overrides
+                descBio: "Generate the perfect social media bio in seconds.", placeholderBio: "e.g. Fitness coach, love pizza, helping moms get strong...", inputBio: "Tell us about yourself", btnBio: "Generate Bios",
+                descCap: "Write engaging captions with emojis and hashtags.", placeholderCap: "e.g. A photo of my cat sleeping on my laptop keyboard.", inputCap: "What is this post/photo about?", btnCap: "Write Captions",
+                descHook: "Stop the scroll with 5 catchy opening lines for TikTok/Reels.", placeholderHook: "e.g. 3 ways to organize your desk for maximum productivity.", inputHook: "What is your video about?", btnHook: "Generate Hooks",
+                descPlan: "Beat writer's block with a full week of highly engaging video ideas.", placeholderPlan: "e.g. Real estate tips, budget travel, easy healthy recipes...", inputPlan: "What is your niche or topic?", btnPlan: "Generate Planner",
+                descRoast: "Get playfully roasted, then get an improved version.", placeholderRoast: "e.g. 'Just a guy trying to make it in the world.'", inputRoast: "Paste your current bio or profile link here:", btnRoast: "Roast Me",
+                descProf: "Save your social media link or base bio. The AI will use it to personalize everything.", placeholderProf: "https://www.tiktok.com/@username OR 'I'm a tech reviewer...'", inputProf: "Your Profile Link or Base Bio", btnProf: "Save Context",
+                lblOptional: "Optional (Using Saved Context)"
+            },
+            ku: {
+                setup: "ڕێکخستن", navProfile: "زانیاری پرۆفایل",
+                tools: "ئامرازەکان", navBio: "دروستکەری بایۆ", navCaption: "کاپشنی ڤایرۆڵی", navHook: "هووکی ڤیدیۆ", navPlanner: "پلانی ٧ ڕۆژە", navRoast: "هەڵسەنگاندنی پرۆفایل",
+                account: "هەژمار", navHistory: "مێژووەکەم", navDark: "دۆخی تاریک",
+                btnSignOut: "چوونە دەرەوە", btnSignIn: "چوونە ژوورەوە", syncText: "مێژووەکەت هاوکات بکە",
+                labelPlatform: "پلاتفۆرم", labelTone: "تۆن", tonePro: "پڕۆفیشناڵ", toneFun: "کۆمیدی", toneEdgy: "سەرنجڕاکێش",
+                btnExport: "هەناردەکردنی فایل", btnClear: "سڕینەوە",
+                emptyDefault: "ئامرازێک هەڵبژێرە، زانیارییەکان پڕبکەرەوە، و با ژیری دەستکرد کارەکانی تر بکات.",
+                emptyLogin: "تکایە بڕۆ ژوورەوە بۆ بینینی مێژووەکەت.",
+                emptyHistory: "هیچ مێژوویەک نییە. دەست بکە بە دروستکردنی ناوەڕۆک و دوگمەی پاشەکەوتکردن دابگرە!",
+                loading: "لە دروستکردندایە...", toastCopy: "لەبەرگیرا!",
+                titleResults: "ئەنجامەکان", titleHistory: "مێژووی پاشەکەوتکراو",
+                // Tool Config Overrides
+                descBio: "لە چەند چرکەیەکدا باشترین بایۆی سۆشیاڵ میدیا دروست بکە.", placeholderBio: "بۆ نموونە: ڕاهێنەری وەرزشی، حەزم لە پیزایە...", inputBio: "باسێکی خۆتمان بۆ بکە", btnBio: "دروستکردنی بایۆ",
+                descCap: "کاپشنی سەرنجڕاکێش بنووسە لەگەڵ ئیمۆجی و هاشتاگ.", placeholderCap: "بۆ نموونە: وێنەی پشیلەکەم خەوتووە لەسەر کۆمپیوتەرەکەم.", inputCap: "ئەم پۆستە/وێنەیە دەربارەی چییە؟", btnCap: "نووسینی کاپشن",
+                descHook: "٥ ڕستەی دەستپێکی سەرنجڕاکێش دروست بکە بۆ تیکتۆک/ڕیڵز.", placeholderHook: "بۆ نموونە: ٣ ڕێگا بۆ ڕێکخستنی مێزەکەت.", inputHook: "ڤیدیۆکەت دەربارەی چییە؟", btnHook: "دروستکردنی هووک",
+                descPlan: "بیرۆکەی ڤیدیۆی زۆر سەرنجڕاکێش بۆ تەواوی هەفتەیەک دروست بکە.", placeholderPlan: "بۆ نموونە: ئامۆژگاری خانووبەرە، گەشتی هەرزان...", inputPlan: "بوار یان بابەتەکەت چییە؟", btnPlan: "دروستکردنی پلان",
+                descRoast: "هەڵسەنگاندنێکی کۆمیدیانە وەربگرە، پاشان جۆرێکی باشترکراو.", placeholderRoast: "بۆ نموونە: 'تەنها کوڕێکم هەوڵی ژیان دەدەم.'", inputRoast: "بایۆی ئێستات یان لینکی پرۆفایلەکەت لێرە دابنێ:", btnRoast: "هەڵمەسەنگێنە",
+                descProf: "لینکی سۆشیاڵ میدیا یان بایۆکەت پاشەکەوت بکە بۆ تایبەتمەندکردنی ناوەڕۆک.", placeholderProf: "https://www.tiktok.com/@username", inputProf: "لینکی پرۆفایل یان بایۆی سەرەکی", btnProf: "پاشەکەوتکردن",
+                lblOptional: "ئارەزوومەندانە (زانیاریت پاشەکەوت کردووە)"
+            }
+        };
+
+        window.toggleLanguage = function() {
+            currentLang = currentLang === 'en' ? 'ku' : 'en';
+            
+            // RTL Flip
+            document.documentElement.dir = currentLang === 'ku' ? 'rtl' : 'ltr';
+            
+            // Toggle Button Text
+            const langText = currentLang === 'ku' ? 'English / EN' : 'کوردی / KU';
+            document.getElementById('desktopLangBtn').innerText = langText;
+            document.getElementById('mobileLangBtn').innerText = currentLang === 'ku' ? 'EN' : 'KU';
+
+            // Translate Static UI
+            const d = dictionary[currentLang];
+            document.getElementById('t_setup').innerText = d.setup;
+            document.getElementById('t_navProfile').innerText = d.navProfile;
+            document.getElementById('t_tools').innerText = d.tools;
+            document.getElementById('t_navBio').innerText = d.navBio;
+            document.getElementById('t_navCaption').innerText = d.navCaption;
+            document.getElementById('t_navHook').innerText = d.navHook;
+            document.getElementById('t_navPlanner').innerText = d.navPlanner;
+            document.getElementById('t_navRoast').innerText = d.navRoast;
+            document.getElementById('t_account').innerText = d.account;
+            document.getElementById('t_navHistory').innerText = d.navHistory;
+            document.getElementById('t_navDark').innerText = d.navDark;
+            document.getElementById('t_btnSignOut').innerText = d.btnSignOut;
+            document.getElementById('t_btnSignIn').innerText = d.btnSignIn;
+            document.getElementById('t_syncText').innerText = d.syncText;
+            document.getElementById('t_labelPlatform').innerText = d.labelPlatform;
+            document.getElementById('t_labelTone').innerText = d.labelTone;
+            document.getElementById('t_tonePro').innerText = d.tonePro;
+            document.getElementById('t_toneFun').innerText = d.toneFun;
+            document.getElementById('t_toneEdgy').innerText = d.toneEdgy;
+            document.getElementById('t_btnExport').innerText = d.btnExport;
+            document.getElementById('t_btnClear').innerText = d.btnClear;
+            document.getElementById('t_loading').innerText = d.loading;
+            
+            // Update Empty States based on history tab
+            if (currentTool === 'history') {
+                document.getElementById('rightSideTitle').innerText = d.titleHistory;
+                document.getElementById('emptyStateText').innerText = !currentUser ? d.emptyLogin : d.emptyHistory;
+            } else {
+                document.getElementById('rightSideTitle').innerText = d.titleResults;
+                document.getElementById('emptyStateText').innerText = d.emptyDefault;
+            }
+
+            // Refresh Dynamic UI
+            window.switchTool(currentTool, null); 
+        };
+
         // --- 1. Firebase Setup for Secure Accounts & Database ---
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInWithCustomToken, signInAnonymously, onAuthStateChanged, GoogleAuthProvider, signInWithPopup, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, collection, addDoc, onSnapshot, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // Your real Firebase Configuration
         const firebaseConfig = {
             apiKey: "AIzaSyBmJdtlXRjIVp3cMbQwKCcFGYgwozLjo2k",
             authDomain: "creatorkit-e7832.firebaseapp.com",
@@ -326,7 +409,6 @@
             auth = getAuth(app);
             db = getFirestore(app);
 
-            // Handle Initial Load
             const initAuth = async () => {
                 try {
                     if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
@@ -338,13 +420,12 @@
                     try {
                         await signInAnonymously(auth);
                     } catch (anonErr) {
-                        console.log("Anonymous auth is disabled in your project. User must sign in manually with Google.");
+                        console.log("Anonymous auth disabled. User must sign in manually.");
                     }
                 }
             };
             initAuth();
 
-            // Listen for User Session Changes
             onAuthStateChanged(auth, (user) => {
                 currentUser = user;
                 const loggedInUI = document.getElementById('loggedInState');
@@ -373,14 +454,12 @@
                     userSocialAvatar = ""; 
                     if (currentTool === 'history') renderHistoryList();
                 }
-                
                 updateDynamicToolUI();
             });
         } catch (error) {
-            console.warn("Firebase running in offline/demo mode.", error);
+            console.warn("Firebase offline.", error);
         }
 
-        // --- Auth Functions ---
         const googleProvider = new GoogleAuthProvider();
         
         window.signInWithGoogle = async () => {
@@ -399,7 +478,7 @@
         window.handleSignOut = async () => {
             try {
                 await signOut(auth);
-                window.showToast("Signed out successfully.");
+                window.showToast(dictionary[currentLang].btnSignOut + " Successful");
                 if (currentTool === 'history') {
                     window.switchTool('bio', null); 
                 }
@@ -408,28 +487,19 @@
             }
         };
 
-        // --- Database History ---
         function setupHistoryListener() {
             if (!currentUser) return;
             const historyRef = collection(db, 'artifacts', appId, 'users', currentUser.uid, 'history');
-            
             onSnapshot(historyRef, (snapshot) => {
                 generationHistory = [];
                 snapshot.forEach(doc => {
                     generationHistory.push({ id: doc.id, ...doc.data() });
                 });
-                
                 generationHistory.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
-                
-                if (currentTool === 'history') {
-                    renderHistoryList();
-                }
-            }, (error) => {
-                console.error("Database connection error", error);
+                if (currentTool === 'history') renderHistoryList();
             });
         }
 
-        // --- Load & Save Profile Context ---
         async function loadUserProfile() {
             if (!currentUser) return;
             try {
@@ -455,12 +525,11 @@
 
         async function saveUserProfileContext(text) {
             if (!currentUser) {
-                window.showToast("Please sign in to save your profile!");
+                window.showToast(dictionary[currentLang].emptyLogin);
                 return;
             }
             try {
                 const extractedAvatar = extractAvatarUrl(text) || ""; 
-
                 const profileDocRef = doc(db, 'artifacts', appId, 'users', currentUser.uid, 'settings', 'profile');
                 await setDoc(profileDocRef, { 
                     context: text, 
@@ -482,49 +551,41 @@
 
         window.saveSingleResult = async function(toolTitle, inputText, singleResultText, buttonElement) {
             if (!currentUser) {
-                window.showToast("Please sign in to save items!");
+                window.showToast(dictionary[currentLang].emptyLogin);
                 return;
             }
-            
             try {
                 buttonElement.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
                 const historyRef = collection(db, 'artifacts', appId, 'users', currentUser.uid, 'history');
-                
                 await addDoc(historyRef, {
                     tool: toolTitle,
                     input: inputText,
                     results: [singleResultText], 
                     timestamp: new Date().toISOString()
                 });
-                
                 buttonElement.innerHTML = '<i class="fa-solid fa-check text-green-500"></i>';
                 buttonElement.disabled = true; 
                 window.showToast("Saved to History!");
             } catch (e) {
                 console.error("Failed to save to history", e);
-                window.showToast("Error saving item.");
                 buttonElement.innerHTML = '<i class="fa-regular fa-bookmark"></i>';
             }
         };
 
         window.exportHistoryCSV = function() {
             if (generationHistory.length === 0) {
-                window.showToast("Your history is empty!");
+                window.showToast(dictionary[currentLang].emptyHistory);
                 return;
             }
-
             let csvContent = "data:text/csv;charset=utf-8,";
             csvContent += "Date,Tool,Input,Generated Content\n";
-
             generationHistory.forEach(item => {
                 const date = new Date(item.timestamp).toLocaleDateString();
                 const safeTool = item.tool.replace(/"/g, '""');
                 const safeInput = item.input.replace(/"/g, '""');
                 const combinedResults = item.results.join(" | ").replace(/"/g, '""');
-                
                 csvContent += `"${date}","${safeTool}","${safeInput}","${combinedResults}"\n`;
             });
-
             const encodedUri = encodeURI(csvContent);
             const link = document.createElement("a");
             link.setAttribute("href", encodedUri);
@@ -537,77 +598,24 @@
 
         // --- 2. Configuration & API ---
         const isNetlifyOrVercel = window.location.hostname.includes('netlify.app') || window.location.hostname.includes('vercel.app');
+        // NOTE: The user left apiKey blank for Vercel, so it will use the backend. 
         const API_URL = isNetlifyOrVercel 
             ? `/api/generate` 
-            : `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
+            : `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=`;
 
         let currentTool = 'bio';
 
-        const toolsConfig = {
-            bio: {
-                title: "Bio Generator",
-                desc: "Generate the perfect social media bio in seconds.",
-                icon: "fa-regular fa-id-badge text-indigo-500 dark:text-indigo-400",
-                inputLabel: "Tell us about yourself",
-                placeholder: "e.g. Fitness coach, love pizza, helping moms get strong...",
-                showOptions: true,
-                btnText: "Generate Bios",
-                optionalWithContext: true
-            },
-            caption: {
-                title: "Viral Captions",
-                desc: "Write engaging captions with emojis and hashtags.",
-                icon: "fa-solid fa-pen-nib text-pink-500 dark:text-pink-400",
-                inputLabel: "What is this post/photo about?",
-                placeholder: "e.g. A photo of my cat sleeping on my laptop keyboard.",
-                showOptions: true,
-                btnText: "Write Captions",
-                optionalWithContext: false 
-            },
-            hook: {
-                title: "Video Hooks",
-                desc: "Stop the scroll with 5 catchy opening lines for TikTok/Reels.",
-                icon: "fa-solid fa-magnet text-yellow-500 dark:text-yellow-400",
-                inputLabel: "What is your video about?",
-                placeholder: "e.g. 3 ways to organize your desk for maximum productivity.",
-                showOptions: false,
-                btnText: "Generate Hooks",
-                optionalWithContext: false 
-            },
-            planner: {
-                title: "7-Day Content Planner",
-                desc: "Beat writer's block with a full week of highly engaging video ideas.",
-                icon: "fa-solid fa-calendar-week text-blue-500 dark:text-blue-400",
-                inputLabel: "What is your niche or topic?",
-                placeholder: "e.g. Real estate tips, budget travel, easy healthy recipes...",
-                showOptions: true,
-                btnText: "Generate Planner",
-                optionalWithContext: true
-            },
-            roast: {
-                title: "Roast My Profile",
-                desc: "Get playfully roasted, then get an improved version.",
-                icon: "fa-solid fa-fire text-orange-500 dark:text-orange-400",
-                inputLabel: "Paste your current bio or profile link here:",
-                placeholder: "e.g. 'Just a guy trying to make it in the world.'",
-                showOptions: false,
-                btnText: "Roast Me",
-                optionalWithContext: true
-            },
-            profile: {
-                title: "Profile Context",
-                desc: "Save your social media link or base bio. The AI will use it to personalize everything.",
-                icon: "fa-solid fa-user-cog text-green-500 dark:text-green-400",
-                inputLabel: "Your Profile Link or Base Bio",
-                placeholder: "https://www.tiktok.com/@username OR 'I'm a tech reviewer in NYC...'",
-                showOptions: false,
-                btnText: "Save Context",
-                optionalWithContext: false
-            },
-            history: {
-                title: "My History",
-                icon: "fa-solid fa-clock-rotate-left text-gray-500 dark:text-gray-400"
-            }
+        const getToolsConfig = () => {
+            const d = dictionary[currentLang];
+            return {
+                bio: { title: d.navBio, desc: d.descBio, icon: "fa-regular fa-id-badge text-indigo-500 dark:text-indigo-400", inputLabel: d.inputBio, placeholder: d.placeholderBio, showOptions: true, btnText: d.btnBio, optionalWithContext: true },
+                caption: { title: d.navCaption, desc: d.descCap, icon: "fa-solid fa-pen-nib text-pink-500 dark:text-pink-400", inputLabel: d.inputCap, placeholder: d.placeholderCap, showOptions: true, btnText: d.btnCap, optionalWithContext: false },
+                hook: { title: d.navHook, desc: d.descHook, icon: "fa-solid fa-magnet text-yellow-500 dark:text-yellow-400", inputLabel: d.inputHook, placeholder: d.placeholderHook, showOptions: false, btnText: d.btnHook, optionalWithContext: false },
+                planner: { title: d.navPlanner, desc: d.descPlan, icon: "fa-solid fa-calendar-week text-blue-500 dark:text-blue-400", inputLabel: d.inputPlan, placeholder: d.placeholderPlan, showOptions: true, btnText: d.btnPlan, optionalWithContext: true },
+                roast: { title: d.navRoast, desc: d.descRoast, icon: "fa-solid fa-fire text-orange-500 dark:text-orange-400", inputLabel: d.inputRoast, placeholder: d.placeholderRoast, showOptions: false, btnText: d.btnRoast, optionalWithContext: true },
+                profile: { title: d.navProfile, desc: d.descProf, icon: "fa-solid fa-user-cog text-green-500 dark:text-green-400", inputLabel: d.inputProf, placeholder: d.placeholderProf, showOptions: false, btnText: d.btnProf, optionalWithContext: false },
+                history: { title: d.navHistory, icon: "fa-solid fa-clock-rotate-left text-gray-500 dark:text-gray-400" }
+            };
         };
 
         // --- 3. UI State Management ---
@@ -623,25 +631,23 @@
         function updateDynamicToolUI() {
             const dynamicUI = document.getElementById('dynamicToolUI');
             dynamicUI.innerHTML = ''; 
+            const d = dictionary[currentLang];
+            const config = getToolsConfig()[currentTool];
 
-            // Handle the Optional Labels
             if (currentTool !== 'profile' && currentTool !== 'history') {
-                const config = toolsConfig[currentTool];
                 let labelHtml = config.inputLabel;
                 if (config.optionalWithContext && userProfileContext) {
-                    labelHtml += ` <span class="text-green-600 dark:text-green-400 text-xs ml-2 font-bold"><i class="fa-solid fa-magic"></i> Optional (Using Saved Context)</span>`;
+                    labelHtml += ` <span class="text-green-600 dark:text-green-400 text-xs mx-2 font-bold"><i class="fa-solid fa-magic"></i> ${d.lblOptional}</span>`;
                 }
                 document.getElementById('mainInputLabel').innerHTML = labelHtml;
             }
 
-            // Handle the Profile Context UI (Warnings and Avatars)
             if (currentTool === 'profile') {
                 dynamicUI.classList.remove('hidden');
                 if (currentUser && !currentUser.isAnonymous) {
                     const googlePhoto = currentUser.photoURL || '';
                     let avatarHtml = '';
                     let titleText = 'Account Linked';
-                    
                     if (userSocialAvatar) {
                         const fallbackImg = googlePhoto ? googlePhoto : 'https://ui-avatars.com/api/?name=Creator&background=random';
                         avatarHtml = `<img src="${userSocialAvatar}" onerror="this.onerror=null; this.src='${fallbackImg}';" class="w-12 h-12 rounded-full border-2 border-green-500 shadow-md object-cover bg-white">`;
@@ -651,13 +657,12 @@
                     } else {
                         avatarHtml = `<div class="w-10 h-10 rounded-full bg-gradient-to-r from-purple-500 to-indigo-500 flex items-center justify-center text-white"><i class="fa-solid fa-user"></i></div>`;
                     }
-
                     dynamicUI.innerHTML = `
                         <div class="flex items-center gap-4 bg-white/50 dark:bg-gray-800/50 p-4 rounded-xl border border-gray-200 dark:border-gray-700 mt-2 shadow-sm">
                             ${avatarHtml}
                             <div>
                                 <p class="text-sm font-bold text-gray-800 dark:text-gray-200">${titleText}</p>
-                                <p class="text-xs text-green-600 dark:text-green-400 font-medium mt-0.5"><i class="fa-solid fa-cloud-arrow-up mr-1"></i> Ready to personalize content</p>
+                                <p class="text-xs text-green-600 dark:text-green-400 font-medium mt-0.5"><i class="fa-solid fa-cloud-arrow-up mx-1"></i> Ready</p>
                             </div>
                         </div>
                     `;
@@ -667,7 +672,7 @@
                             <i class="fa-solid fa-triangle-exclamation mt-0.5 text-amber-500 text-lg"></i>
                             <div>
                                 <p class="font-bold mb-1">Wait! You are not signed in.</p>
-                                <p class="text-xs opacity-90 leading-relaxed">Please sign in with Google using the sidebar menu before saving your context, otherwise your profile will not be saved.</p>
+                                <p class="text-xs opacity-90 leading-relaxed">Please sign in with Google before saving your context.</p>
                             </div>
                         </div>
                     `;
@@ -680,17 +685,21 @@
         window.switchTool = function(toolKey, event) {
             if(event) event.preventDefault();
             currentTool = toolKey;
-            const config = toolsConfig[toolKey];
+            const config = getToolsConfig()[toolKey];
+            const d = dictionary[currentLang];
 
-            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
-            if(event) event.currentTarget.classList.add('active');
+            // Only visually update active class if event is passed (click on sidebar)
+            if(event) {
+                document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+                event.currentTarget.classList.add('active');
+            }
 
             if (toolKey === 'history') {
                 inputSection.classList.add('hidden');
                 outputSection.classList.remove('lg:w-1/2');
                 outputSection.classList.add('w-full');
                 
-                document.getElementById('rightSideTitle').innerText = "Saved Generations";
+                document.getElementById('rightSideTitle').innerText = d.titleHistory;
                 document.getElementById('clearBtn').classList.add('hidden');
                 document.getElementById('exportCsvBtn').classList.remove('hidden'); 
                 
@@ -704,9 +713,9 @@
                 document.getElementById('toolDesc').innerText = config.desc;
                 document.getElementById('toolIcon').className = config.icon;
                 mainInput.placeholder = config.placeholder;
-                document.getElementById('btnText').innerText = config.btnText || "Generate Content";
+                document.getElementById('btnText').innerText = config.btnText || d.btnBio;
                 
-                document.getElementById('rightSideTitle').innerText = "Results";
+                document.getElementById('rightSideTitle').innerText = d.titleResults;
                 document.getElementById('clearBtn').classList.remove('hidden');
                 document.getElementById('exportCsvBtn').classList.add('hidden'); 
                 
@@ -725,16 +734,17 @@
         // --- 4. History Rendering ---
         function renderHistoryList() {
             Array.from(resultsContainer.querySelectorAll('.result-card')).forEach(el => el.remove());
+            const d = dictionary[currentLang];
             
             if (!currentUser) {
                 emptyState.classList.remove('hidden');
-                emptyStateText.innerText = "Please sign in to view your history.";
+                emptyStateText.innerText = d.emptyLogin;
                 return;
             }
 
             if (generationHistory.length === 0) {
                 emptyState.classList.remove('hidden');
-                emptyStateText.innerText = "No history yet. Start generating content and click the save icon!";
+                emptyStateText.innerText = d.emptyHistory;
                 return;
             }
 
@@ -747,8 +757,8 @@
                 
                 let resultsHtml = item.results.map(res => 
                     `<div class="bg-gray-50 dark:bg-gray-700/50 p-3 rounded-lg text-sm text-gray-700 dark:text-gray-300 mb-2 relative group">
-                        <p class="pr-6 whitespace-pre-wrap">${res}</p>
-                        <button onclick='window.copyToClipboard(${JSON.stringify(res).replace(/'/g, "&#39;")})' class="absolute top-2 right-2 text-gray-400 hover:text-purple-500 opacity-0 group-hover:opacity-100 transition"><i class="fa-regular fa-copy"></i></button>
+                        <p class="px-6 whitespace-pre-wrap">${res}</p>
+                        <button onclick='window.copyToClipboard(${JSON.stringify(res).replace(/'/g, "&#39;")})' class="absolute top-2 right-2 rtl:left-2 rtl:right-auto text-gray-400 hover:text-purple-500 opacity-0 group-hover:opacity-100 transition"><i class="fa-regular fa-copy"></i></button>
                     </div>`
                 ).join('');
 
@@ -757,7 +767,7 @@
                         <span class="text-xs font-bold text-purple-600 dark:text-purple-400 bg-purple-50 dark:bg-purple-900/30 px-2 py-1 rounded">${item.tool}</span>
                         <span class="text-xs text-gray-400">${date}</span>
                     </div>
-                    <p class="text-sm font-medium text-gray-600 dark:text-gray-400 mb-3 border-l-2 border-gray-200 dark:border-gray-600 pl-2">"${item.input}"</p>
+                    <p class="text-sm font-medium text-gray-600 dark:text-gray-400 mb-3 border-s-2 border-gray-200 dark:border-gray-600 px-2">"${item.input}"</p>
                     <div class="space-y-2">
                         ${resultsHtml}
                     </div>
@@ -771,7 +781,7 @@
             let inputText = mainInput.value.trim();
             const platform = document.getElementById('platformSelect').value;
             const tone = document.querySelector('input[name="tone"]:checked').value;
-            const config = toolsConfig[currentTool];
+            const config = getToolsConfig()[currentTool];
 
             if (currentTool === 'profile') {
                 if (!inputText) {
@@ -817,6 +827,11 @@
                 systemPrompt += `\n\nCRITICAL CONTEXT: Deeply personalize the results using this background information/link about the user: "${userProfileContext}". Integrate this persona naturally into the generated content.`;
             }
 
+            // KURDISH MAGIC TRICK
+            if (currentLang === 'ku') {
+                systemPrompt += `\n\nCRITICAL LANGUAGE REQUIREMENT: You MUST translate and write the final output entirely in Sorani Kurdish using the Arabic alphabet. Ensure the output is natural and professional in Kurdish. Do not output English unless absolutely necessary for a brand name. Keep the JSON Array structure exactly the same.`;
+            }
+
             const payload = {
                 contents: [{ parts: [{ text: `Input: ${inputText}` }] }],
                 systemInstruction: { parts: [{ text: systemPrompt }] },
@@ -856,7 +871,7 @@
         // --- 6. Helpers & UI Actions ---
         function renderResults(resultsArray) {
             const currentInputText = mainInput.value.trim();
-            const currentToolTitle = toolsConfig[currentTool].title;
+            const currentToolTitle = getToolsConfig()[currentTool].title;
 
             resultsArray.forEach((text, index) => {
                 const card = document.createElement('div');
@@ -864,7 +879,7 @@
                 
                 let labelHtml = "";
                 if (currentTool === 'roast') {
-                    const labelText = index === 0 ? "🔥 The Roast" : "✨ The Upgrade";
+                    const labelText = index === 0 ? "🔥" : "✨";
                     const labelColor = index === 0 ? "text-orange-500 bg-orange-50 dark:bg-orange-900/30" : "text-purple-600 bg-purple-50 dark:bg-purple-900/30";
                     labelHtml = `<span class="inline-block px-2 py-1 rounded text-xs font-bold mb-2 ${labelColor}">${labelText}</span><br>`;
                 }
@@ -885,9 +900,9 @@
 
                 card.innerHTML = `
                     ${labelHtml}
-                    <p class="text-gray-700 dark:text-gray-200 text-sm whitespace-pre-wrap pr-20 leading-relaxed">${text}</p>
+                    <p class="text-gray-700 dark:text-gray-200 text-sm whitespace-pre-wrap px-12 leading-relaxed">${text}</p>
                     
-                    <div class="absolute top-3 right-3 flex gap-1 opacity-0 group-hover:opacity-100 focus-within:opacity-100 transition">
+                    <div class="absolute top-3 right-3 rtl:left-3 rtl:right-auto flex gap-1 opacity-0 group-hover:opacity-100 focus-within:opacity-100 transition">
                         ${saveButtonHtml}
                         <button onclick='window.copyToClipboard(${safeText})' 
                                 class="text-gray-400 hover:text-purple-600 dark:hover:text-purple-400 transition p-2 rounded-lg hover:bg-purple-50 dark:hover:bg-gray-700" title="Copy text">
@@ -912,7 +927,7 @@
             textArea.select();
             document.execCommand('copy');
             document.body.removeChild(textArea);
-            window.showToast("Copied to clipboard!");
+            window.showToast(dictionary[currentLang].toastCopy);
         };
 
         window.showToast = function(msg) {
@@ -961,6 +976,9 @@
         mainInput.addEventListener('keydown', (e) => {
             if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) window.generateContent();
         });
+
+        // Initialize translations to default
+        window.switchTool('bio', null);
     </script>
 </body>
 </html>
