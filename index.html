@@ -66,7 +66,6 @@
         .dark ::-webkit-scrollbar-thumb:hover { background: #64748b; }
         
         /* Active Nav Item */
-        /* Note: RTL changes borders logically */
         [dir="ltr"] .nav-item.active { border-right: 4px solid #7c3aed; }
         [dir="rtl"] .nav-item.active { border-left: 4px solid #7c3aed; }
         
@@ -79,6 +78,43 @@
             background: linear-gradient(to right, rgba(124, 58, 237, 0.2), rgba(79, 70, 229, 0.1));
             color: #a78bfa;
         }
+
+        /* ── MOBILE: tab-bar switcher ─────────────────────────────── */
+        /* On small screens the two panels are stacked and we show a   */
+        /* sticky tab bar to jump between them without scrolling.      */
+        @media (max-width: 1023px) {
+            /* The outer card becomes a normal block (no flex-row) */
+            #mainCard { flex-direction: column; min-height: unset; }
+
+            /* Both panels take full width; only the active one is visible */
+            #inputSection, #outputSection {
+                width: 100% !important;
+                flex: none;
+                /* hidden by default – JS toggles .mobile-active */
+                display: none;
+                border-right: none !important;
+            }
+            #inputSection.mobile-active,
+            #outputSection.mobile-active { display: flex; flex-direction: column; }
+
+            /* Tab bar lives between the mobile header and the card */
+            #mobileTabBar { display: flex; }
+        }
+        @media (min-width: 1024px) {
+            /* Desktop: both panels always visible, tab bar hidden */
+            #inputSection, #outputSection { display: flex !important; flex-direction: column; }
+            #mobileTabBar { display: none !important; }
+        }
+
+        /* Error card animation */
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%       { transform: translateX(-6px); }
+            40%       { transform: translateX(6px); }
+            60%       { transform: translateX(-4px); }
+            80%       { transform: translateX(4px); }
+        }
+        .error-shake { animation: shake 0.4s ease; }
     </style>
 </head>
 <body class="bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 dark:from-gray-900 dark:via-slate-900 dark:to-gray-900 h-screen flex overflow-hidden transition-colors duration-300">
@@ -176,11 +212,35 @@
     <div class="flex-1 flex flex-col h-full overflow-hidden pt-16 md:pt-0 relative">
         <div id="overlay" class="hidden absolute inset-0 bg-gray-900/40 z-30 md:hidden backdrop-blur-sm"></div>
 
+        <!-- ── Mobile Tab Bar ────────────────────────────────────── -->
+        <!-- Shown only on < lg, hidden on desktop via CSS above     -->
+        <div id="mobileTabBar" class="hidden sticky top-16 z-20 mx-4 mt-3 mb-1 bg-white/80 dark:bg-gray-800/80 backdrop-blur-md rounded-2xl shadow-md border border-gray-100 dark:border-gray-700 overflow-hidden">
+            <div class="grid grid-cols-2">
+                <button id="tabInputBtn"
+                        onclick="showMobileTab('input')"
+                        class="flex items-center justify-center gap-2 py-3 text-sm font-semibold transition
+                               bg-purple-600 text-white">
+                    <i class="fa-solid fa-pen-to-square"></i>
+                    <span id="t_tabInput">Fill In</span>
+                </button>
+                <button id="tabOutputBtn"
+                        onclick="showMobileTab('output')"
+                        class="flex items-center justify-center gap-2 py-3 text-sm font-semibold transition
+                               text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700/50">
+                    <i class="fa-solid fa-sparkles"></i>
+                    <span id="t_tabOutput">Results</span>
+                    <!-- Badge that lights up when new results arrive -->
+                    <span id="resultsBadge" class="hidden w-2 h-2 rounded-full bg-green-400 animate-pulse"></span>
+                </button>
+            </div>
+        </div>
+        <!-- ──────────────────────────────────────────────────────── -->
+
         <div class="flex-1 overflow-y-auto p-4 md:p-8">
-            <div class="max-w-5xl mx-auto glass-panel rounded-3xl shadow-xl overflow-hidden flex flex-col lg:flex-row min-h-[700px]">
+            <div id="mainCard" class="max-w-5xl mx-auto glass-panel rounded-3xl shadow-xl overflow-hidden flex flex-col lg:flex-row min-h-[700px]">
                 
                 <!-- Left Side: Dynamic Input Form -->
-                <div id="inputSection" class="w-full lg:w-1/2 p-6 md:p-8 bg-white/60 dark:bg-gray-800/40 flex flex-col border-r border-white/50 dark:border-gray-700/50 transition-colors">
+                <div id="inputSection" class="mobile-active w-full lg:w-1/2 p-6 md:p-8 bg-white/60 dark:bg-gray-800/40 flex flex-col border-r border-white/50 dark:border-gray-700/50 transition-colors">
                     <div class="mb-8">
                         <h2 id="toolTitle" class="text-3xl font-bold text-gray-800 dark:text-white flex items-center gap-2">
                             <i id="toolIcon" class="fa-regular fa-id-badge text-indigo-500 dark:text-indigo-400"></i> 
@@ -302,6 +362,13 @@
                 emptyHistory: "No history yet. Start generating content and click the save icon!",
                 loading: "Crafting AI magic...", toastCopy: "Copied to clipboard!",
                 titleResults: "Results", titleHistory: "Saved Generations",
+                tabInput: "Fill In", tabOutput: "Results",
+                // Error messages
+                errServer: "Server error — please try again in a moment.",
+                errNetwork: "No connection — check your internet and retry.",
+                errParse: "Unexpected response from AI — please try again.",
+                errGeneric: "Something went wrong — please try again.",
+                errRetry: "Try Again",
                 // Tool Config Overrides
                 descBio: "Generate the perfect social media bio in seconds.", placeholderBio: "e.g. Fitness coach, love pizza, helping moms get strong...", inputBio: "Tell us about yourself", btnBio: "Generate Bios",
                 descCap: "Write engaging captions with emojis and hashtags.", placeholderCap: "e.g. A photo of my cat sleeping on my laptop keyboard.", inputCap: "What is this post/photo about?", btnCap: "Write Captions",
@@ -323,6 +390,13 @@
                 emptyHistory: "هیچ مێژوویەک نییە. دەست بکە بە دروستکردنی ناوەڕۆک و دوگمەی پاشەکەوتکردن دابگرە!",
                 loading: "لە دروستکردندایە...", toastCopy: "لەبەرگیرا!",
                 titleResults: "ئەنجامەکان", titleHistory: "مێژووی پاشەکەوتکراو",
+                tabInput: "پڕکردنەوە", tabOutput: "ئەنجامەکان",
+                // Error messages (Kurdish)
+                errServer: "هەڵەی سێرڤەر — تکایە دووبارە هەوڵ بدەرەوە.",
+                errNetwork: "کەبڵ نییە — پەیوەندی ئینتەرنێتەکەت بپشکنە.",
+                errParse: "وەڵامی نامۆقول لە AI — تکایە دووبارە هەوڵ بدەرەوە.",
+                errGeneric: "هەڵەیەک ڕوویدا — تکایە دووبارە هەوڵ بدەرەوە.",
+                errRetry: "دووبارە هەوڵ بدە",
                 // Tool Config Overrides
                 descBio: "لە چەند چرکەیەکدا باشترین بایۆی سۆشیاڵ میدیا دروست بکە.", placeholderBio: "بۆ نموونە: ڕاهێنەری وەرزشی، حەزم لە پیزایە...", inputBio: "باسێکی خۆتمان بۆ بکە", btnBio: "دروستکردنی بایۆ",
                 descCap: "کاپشنی سەرنجڕاکێش بنووسە لەگەڵ ئیمۆجی و هاشتاگ.", placeholderCap: "بۆ نموونە: وێنەی پشیلەکەم خەوتووە لەسەر کۆمپیوتەرەکەم.", inputCap: "ئەم پۆستە/وێنەیە دەربارەی چییە؟", btnCap: "نووسینی کاپشن",
@@ -369,6 +443,8 @@
             document.getElementById('t_btnExport').innerText = d.btnExport;
             document.getElementById('t_btnClear').innerText = d.btnClear;
             document.getElementById('t_loading').innerText = d.loading;
+            document.getElementById('t_tabInput').innerText = d.tabInput;
+            document.getElementById('t_tabOutput').innerText = d.tabOutput;
             
             // Update Empty States based on history tab
             if (currentTool === 'history') {
@@ -383,21 +459,28 @@
             window.switchTool(currentTool, null); 
         };
 
-        // --- 1. Firebase Setup for Secure Accounts & Database ---
+        // --- 1. Firebase Setup ---
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInWithCustomToken, signInAnonymously, onAuthStateChanged, GoogleAuthProvider, signInWithPopup, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, collection, addDoc, onSnapshot, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyBmJdtlXRjIVp3cMbQwKCcFGYgwozLjo2k",
-            authDomain: "creatorkit-e7832.firebaseapp.com",
-            projectId: "creatorkit-e7832",
-            storageBucket: "creatorkit-e7832.firebasestorage.app",
-            messagingSenderId: "816063437935",
-            appId: "1:816063437935:web:03e8a3ec0923eb83f4019a",
-            measurementId: "G-XH4E6DHDQ5"
-        };
-        const appId = 'creator-ai-dashboard'; 
+        // Environment-Aware Configuration
+        let firebaseConfig;
+        try {
+            firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {
+                apiKey: "AIzaSyBmJdtlXRjIVp3cMbQwKCcFGYgwozLjo2k",
+                authDomain: "creatorkit-e7832.firebaseapp.com",
+                projectId: "creatorkit-e7832",
+                storageBucket: "creatorkit-e7832.firebasestorage.app",
+                messagingSenderId: "816063437935",
+                appId: "1:816063437935:web:03e8a3ec0923eb83f4019a",
+                measurementId: "G-XH4E6DHDQ5"
+            };
+        } catch(e) {
+            console.warn("Could not parse config, falling back to default.", e);
+        }
+        
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'creator-ai-dashboard'; 
         
         let app, auth, db, currentUser = null;
         let generationHistory = [];
@@ -489,6 +572,7 @@
 
         function setupHistoryListener() {
             if (!currentUser) return;
+            // Uses valid environment collection pattern structure
             const historyRef = collection(db, 'artifacts', appId, 'users', currentUser.uid, 'history');
             onSnapshot(historyRef, (snapshot) => {
                 generationHistory = [];
@@ -497,6 +581,8 @@
                 });
                 generationHistory.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
                 if (currentTool === 'history') renderHistoryList();
+            }, (error) => {
+                console.error("Error fetching history:", error);
             });
         }
 
@@ -597,11 +683,13 @@
         };
 
         // --- 2. Configuration & API ---
+        const apiKey = ""; // Provided by execution environment automatically
         const isNetlifyOrVercel = window.location.hostname.includes('netlify.app') || window.location.hostname.includes('vercel.app');
-        // NOTE: The user left apiKey blank for Vercel, so it will use the backend. 
+        
+        // Use preview model when running in sandbox environment, preserve Vercel route for production
         const API_URL = isNetlifyOrVercel 
             ? `/api/generate` 
-            : `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=`;
+            : `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
 
         let currentTool = 'bio';
 
@@ -627,6 +715,38 @@
         const loadingState = document.getElementById('loadingState');
         const inputSection = document.getElementById('inputSection');
         const outputSection = document.getElementById('outputSection');
+
+        // ── Mobile tab switching ──────────────────────────────────
+        window.showMobileTab = function(tab) {
+            const isInput = tab === 'input';
+            const inputBtn  = document.getElementById('tabInputBtn');
+            const outputBtn = document.getElementById('tabOutputBtn');
+            const badge     = document.getElementById('resultsBadge');
+
+            if (isInput) {
+                inputSection.classList.add('mobile-active');
+                outputSection.classList.remove('mobile-active');
+                inputBtn.className  = 'flex items-center justify-center gap-2 py-3 text-sm font-semibold transition bg-purple-600 text-white';
+                outputBtn.className = 'flex items-center justify-center gap-2 py-3 text-sm font-semibold transition text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700/50';
+            } else {
+                outputSection.classList.add('mobile-active');
+                inputSection.classList.remove('mobile-active');
+                outputBtn.className = 'flex items-center justify-center gap-2 py-3 text-sm font-semibold transition bg-purple-600 text-white';
+                inputBtn.className  = 'flex items-center justify-center gap-2 py-3 text-sm font-semibold transition text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700/50';
+                badge.classList.add('hidden'); // clear badge when results tab opened
+            }
+        };
+
+        // Light up the badge and flip to results tab on mobile after generation
+        function notifyMobileResults() {
+            const isMobile = window.innerWidth < 1024;
+            if (!isMobile) return;
+            const badge = document.getElementById('resultsBadge');
+            badge.classList.remove('hidden');
+            // Auto-flip to results tab
+            window.showMobileTab('output');
+        }
+        // ─────────────────────────────────────────────────────────
 
         function updateDynamicToolUI() {
             const dynamicUI = document.getElementById('dynamicToolUI');
@@ -688,14 +808,19 @@
             const config = getToolsConfig()[toolKey];
             const d = dictionary[currentLang];
 
-            // Only visually update active class if event is passed (click on sidebar)
             if(event) {
                 document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
                 event.currentTarget.classList.add('active');
             }
 
             if (toolKey === 'history') {
-                inputSection.classList.add('hidden');
+                // On mobile: show output panel for history
+                if (window.innerWidth < 1024) {
+                    inputSection.classList.remove('mobile-active');
+                    outputSection.classList.add('mobile-active');
+                } else {
+                    inputSection.classList.add('hidden');
+                }
                 outputSection.classList.remove('lg:w-1/2');
                 outputSection.classList.add('w-full');
                 
@@ -705,7 +830,12 @@
                 
                 renderHistoryList();
             } else {
-                inputSection.classList.remove('hidden');
+                if (window.innerWidth < 1024) {
+                    // Mobile: start on the input tab when switching tools
+                    window.showMobileTab('input');
+                } else {
+                    inputSection.classList.remove('hidden');
+                }
                 outputSection.classList.add('lg:w-1/2');
                 outputSection.classList.remove('w-full');
                 
@@ -827,7 +957,6 @@
                 systemPrompt += `\n\nCRITICAL CONTEXT: Deeply personalize the results using this background information/link about the user: "${userProfileContext}". Integrate this persona naturally into the generated content.`;
             }
 
-            // KURDISH MAGIC TRICK
             if (currentLang === 'ku') {
                 systemPrompt += `\n\nCRITICAL LANGUAGE REQUIREMENT: You MUST translate and write the final output entirely in Sorani Kurdish using the Arabic alphabet. Ensure the output is natural and professional in Kurdish. Do not output English unless absolutely necessary for a brand name. Keep the JSON Array structure exactly the same.`;
             }
@@ -841,25 +970,67 @@
                 }
             };
 
-            try {
-                const response = await fetch(API_URL, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
+            // Implement Exponential Backoff for API robustness
+            let attempt = 0;
+            const maxRetries = 5;
+            const delays = [1000, 2000, 4000, 8000, 16000];
+            let response;
+            let finalError = null;
 
-                if (!response.ok) throw new Error(`Server Error ${response.status}`);
+            try {
+                while (attempt <= maxRetries) {
+                    try {
+                        response = await fetch(API_URL, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(payload)
+                        });
+                        
+                        if (response.ok) {
+                            finalError = null;
+                            break; 
+                        }
+                        
+                        if (attempt === maxRetries) {
+                            throw new Error(`HTTP error! status: ${response.status}`);
+                        }
+                    } catch (e) {
+                        finalError = e;
+                        if (attempt === maxRetries) throw e;
+                    }
+                    
+                    // Wait before retrying
+                    await new Promise(r => setTimeout(r, delays[attempt]));
+                    attempt++;
+                }
+
+                if (!response || !response.ok) {
+                    // Classified server errors — give the user a specific message
+                    let errKey = 'errServer';
+                    if (response && response.status === 429) errKey = 'errServer'; // rate limit
+                    if (response && response.status >= 500) errKey = 'errServer';
+                    renderErrorCard(errKey, response ? response.status : null);
+                    return;
+                }
 
                 const data = await response.json();
                 const rawText = data.candidates?.[0]?.content?.parts?.[0]?.text;
-                let resultsArray = JSON.parse(rawText);
-                
+
+                let resultsArray;
+                try {
+                    resultsArray = JSON.parse(rawText);
+                } catch (parseErr) {
+                    renderErrorCard('errParse');
+                    return;
+                }
+
                 renderResults(resultsArray);
+                notifyMobileResults(); // auto-flip to results on mobile
 
             } catch (error) {
-                console.error("Error:", error);
-                window.showToast("Error connecting to AI.");
-                emptyState.classList.remove('hidden');
+                // Fetch itself threw — almost always a network issue after retries fail
+                const isOffline = !navigator.onLine || error instanceof TypeError;
+                renderErrorCard(isOffline ? 'errNetwork' : 'errGeneric');
             } finally {
                 loadingState.classList.add('hidden');
                 loadingState.classList.remove('flex');
@@ -867,6 +1038,52 @@
                 btn.classList.remove('opacity-50');
             }
         };
+
+        // ── Error card renderer ───────────────────────────────────
+        function renderErrorCard(errKey, statusCode) {
+            const d = dictionary[currentLang];
+            emptyState.classList.add('hidden');
+
+            const card = document.createElement('div');
+            card.className = 'result-card error-shake mb-4';
+
+            // Icon per error type
+            const iconMap = {
+                errServer:  { icon: 'fa-server',       color: 'text-orange-500', bg: 'bg-orange-50 dark:bg-orange-900/20', border: 'border-orange-200 dark:border-orange-800/40' },
+                errNetwork: { icon: 'fa-wifi-slash',    color: 'text-red-500',    bg: 'bg-red-50 dark:bg-red-900/20',       border: 'border-red-200 dark:border-red-800/40' },
+                errParse:   { icon: 'fa-triangle-exclamation', color: 'text-yellow-500', bg: 'bg-yellow-50 dark:bg-yellow-900/20', border: 'border-yellow-200 dark:border-yellow-800/40' },
+                errGeneric: { icon: 'fa-circle-xmark', color: 'text-red-500',    bg: 'bg-red-50 dark:bg-red-900/20',       border: 'border-red-200 dark:border-red-800/40' }
+            };
+            const style = iconMap[errKey] || iconMap.errGeneric;
+            const message = d[errKey] || d.errGeneric;
+            const statusHtml = statusCode ? `<span class="ml-2 text-xs font-mono text-gray-400">HTTP ${statusCode}</span>` : '';
+
+            card.innerHTML = `
+                <div class="flex items-start gap-4 p-5 rounded-xl border ${style.bg} ${style.border}">
+                    <div class="mt-0.5 w-10 h-10 rounded-full flex items-center justify-center bg-white/60 dark:bg-gray-900/40 flex-shrink-0 shadow-sm">
+                        <i class="fa-solid ${style.icon} ${style.color} text-lg"></i>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <p class="text-sm font-semibold text-gray-800 dark:text-gray-100 flex items-center flex-wrap gap-1">
+                            Oops, something went wrong${statusHtml}
+                        </p>
+                        <p class="text-sm text-gray-600 dark:text-gray-400 mt-1 leading-relaxed">${message}</p>
+                        <button onclick="window.generateContent()" 
+                                class="mt-3 inline-flex items-center gap-2 text-xs font-semibold px-3 py-1.5 rounded-lg
+                                       bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600
+                                       text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700
+                                       shadow-sm transition active:scale-95">
+                            <i class="fa-solid fa-rotate-right"></i> ${d.errRetry}
+                        </button>
+                    </div>
+                </div>
+            `;
+
+            resultsContainer.appendChild(card);
+            // Flip to results tab on mobile so the error is visible
+            notifyMobileResults();
+        }
+        // ─────────────────────────────────────────────────────────
 
         // --- 6. Helpers & UI Actions ---
         function renderResults(resultsArray) {
@@ -977,7 +1194,7 @@
             if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) window.generateContent();
         });
 
-        // Initialize translations to default
+        // Initialize
         window.switchTool('bio', null);
     </script>
 </body>
