@@ -315,3 +315,61 @@ export const toggleMobileMenu = (forceClose = false) => {
         overlay.classList.remove('hidden');
     }
 };
+
+export const switchTool = (toolKey, event) => {
+    if (event) event.preventDefault();
+    setCurrentTool(toolKey);
+    const config = getToolsConfig()[toolKey];
+    const d = dictionary[currentLang];
+    const mobileTabBar = document.getElementById('mobileTabBar');  // ← ADD THIS
+
+    if (event) {
+        document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+        event.currentTarget.classList.add('active');
+    }
+
+    if (toolKey === 'history') {
+        mobileTabBar.classList.add('hidden');    // ← hide tabs in history mode
+        if (window.innerWidth < 1024) {
+            inputSection.classList.remove('mobile-active');
+            outputSection.classList.add('mobile-active');
+        } else {
+            inputSection.classList.add('hidden');
+        }
+        outputSection.classList.remove('lg:w-1/2');
+        outputSection.classList.add('w-full');
+
+        document.getElementById('rightSideTitle').innerText = d.titleHistory;
+        document.getElementById('clearBtn').classList.add('hidden');
+        document.getElementById('exportCsvBtn').classList.remove('hidden');
+
+        renderHistoryList();
+    } else {
+        mobileTabBar.classList.remove('hidden');  // ← show tabs for all tools
+        if (window.innerWidth < 1024) showMobileTab('input');
+        else inputSection.classList.remove('hidden');
+
+        outputSection.classList.add('lg:w-1/2');
+        outputSection.classList.remove('w-full');
+
+        document.getElementById('toolTitleText').innerText = config.title;
+        document.getElementById('toolDesc').innerText = config.desc;
+        document.getElementById('toolIcon').className = config.icon;
+        mainInput.placeholder = config.placeholder;
+        document.getElementById('btnText').innerText = config.btnText || d.btnBio;
+
+        document.getElementById('rightSideTitle').innerText = d.titleResults;
+        document.getElementById('clearBtn').classList.remove('hidden');
+        document.getElementById('exportCsvBtn').classList.add('hidden');
+
+        optionsSection.classList.toggle('hidden', !config.showOptions);
+        clearResults();
+
+        if (toolKey === 'profile' && userProfileContext) {
+            mainInput.value = userProfileContext;
+        }
+    }
+
+    updateDynamicToolUI();
+    toggleMobileMenu(true);
+};
