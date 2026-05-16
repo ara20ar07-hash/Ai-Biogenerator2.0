@@ -167,11 +167,11 @@ export const toggleLanguage = () => {
     document.documentElement.dir = isKu ? 'rtl' : 'ltr';
 
     // Fix sidebar slide direction for RTL/LTR
-    const sidebar = document.getElementById('sidebar');
-    if (window.innerWidth < 768) {
-        sidebar.classList.remove('-translate-x-full', 'translate-x-full');
-        sidebar.classList.add(isKu ? 'translate-x-full' : '-translate-x-full');
-    }
+const sidebar = document.getElementById('sidebar');
+if (window.innerWidth < 768) {
+    sidebar.classList.remove('-translate-x-full', 'translate-x-full');
+    sidebar.classList.add(isKu ? 'translate-x-full' : '-translate-x-full');
+}
 
     document.getElementById('t_setup').innerText        = d.setup;
     document.getElementById('t_tools').innerText        = d.tools;
