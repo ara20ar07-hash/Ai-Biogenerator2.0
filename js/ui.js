@@ -22,13 +22,13 @@ export const showMobileTab = (tab) => {
     if (isInput) {
         inputSection.classList.add('mobile-active');
         outputSection.classList.remove('mobile-active');
-        inputBtn.className  = 'flex items-center justify-center gap-2 py-3 text-sm font-semibold transition bg-purple-600 text-white';
-        outputBtn.className = 'flex items-center justify-center gap-2 py-3 text-sm font-semibold transition text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700/50';
+        inputBtn.className  = 'flex items-center justify-center gap-2 py-3.5 text-sm font-semibold transition border-b-2 border-purple-600 text-purple-600 dark:text-purple-400 bg-transparent';
+        outputBtn.className = 'flex items-center justify-center gap-2 py-3.5 text-sm font-semibold transition border-b-2 border-transparent text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300';
     } else {
         outputSection.classList.add('mobile-active');
         inputSection.classList.remove('mobile-active');
-        outputBtn.className = 'flex items-center justify-center gap-2 py-3 text-sm font-semibold transition bg-purple-600 text-white';
-        inputBtn.className  = 'flex items-center justify-center gap-2 py-3 text-sm font-semibold transition text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700/50';
+        outputBtn.className = 'flex items-center justify-center gap-2 py-3.5 text-sm font-semibold transition border-b-2 border-purple-600 text-purple-600 dark:text-purple-400 bg-transparent';
+        inputBtn.className  = 'flex items-center justify-center gap-2 py-3.5 text-sm font-semibold transition border-b-2 border-transparent text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300';
         badge.classList.add('hidden');
     }
 };
