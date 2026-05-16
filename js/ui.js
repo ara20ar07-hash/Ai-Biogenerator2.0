@@ -158,48 +158,49 @@ export const switchTool = (toolKey, event) => {
 export const toggleLanguage = () => {
     const newLang = currentLang === 'en' ? 'ku' : 'en';
     setCurrentLang(newLang);
-
     const d = dictionary[newLang];
     const isKu = newLang === 'ku';
 
-    // Update button labels
     document.getElementById('mobileLangBtn').innerText  = isKu ? 'EN' : 'KU';
     document.getElementById('desktopLangBtn').innerText = isKu ? 'English / EN' : 'کوردی / KU';
 
-    // Update RTL direction
     document.documentElement.dir = isKu ? 'rtl' : 'ltr';
 
-    // Update all translatable elements
-    document.getElementById('t_setup').innerText       = d.setup;
-    document.getElementById('t_tools').innerText       = d.tools;
-    document.getElementById('t_account').innerText     = d.account;
-    document.getElementById('t_navProfile').innerText  = d.navProfile;
-    document.getElementById('t_navBio').innerText      = d.navBio;
-    document.getElementById('t_navCaption').innerText  = d.navCaption;
-    document.getElementById('t_navHook').innerText     = d.navHook;
-    document.getElementById('t_navPlanner').innerText  = d.navPlanner;
-    document.getElementById('t_navRoast').innerText    = d.navRoast;
-    document.getElementById('t_navHistory').innerText  = d.navHistory;
-    document.getElementById('t_navDark').innerText     = d.navDark;
-    document.getElementById('t_btnSignIn').innerText   = d.btnSignIn;
-    document.getElementById('t_btnSignOut').innerText  = d.btnSignOut;
-    document.getElementById('t_syncText').innerText    = d.syncText;
+    // Fix sidebar slide direction for RTL/LTR
+    const sidebar = document.getElementById('sidebar');
+    if (window.innerWidth < 768) {
+        sidebar.classList.remove('-translate-x-full', 'translate-x-full');
+        sidebar.classList.add(isKu ? 'translate-x-full' : '-translate-x-full');
+    }
+
+    document.getElementById('t_setup').innerText        = d.setup;
+    document.getElementById('t_tools').innerText        = d.tools;
+    document.getElementById('t_account').innerText      = d.account;
+    document.getElementById('t_navProfile').innerText   = d.navProfile;
+    document.getElementById('t_navBio').innerText       = d.navBio;
+    document.getElementById('t_navCaption').innerText   = d.navCaption;
+    document.getElementById('t_navHook').innerText      = d.navHook;
+    document.getElementById('t_navPlanner').innerText   = d.navPlanner;
+    document.getElementById('t_navRoast').innerText     = d.navRoast;
+    document.getElementById('t_navHistory').innerText   = d.navHistory;
+    document.getElementById('t_navDark').innerText      = d.navDark;
+    document.getElementById('t_btnSignIn').innerText    = d.btnSignIn;
+    document.getElementById('t_btnSignOut').innerText   = d.btnSignOut;
+    document.getElementById('t_syncText').innerText     = d.syncText;
     document.getElementById('t_labelPlatform').innerText = d.labelPlatform;
-    document.getElementById('t_labelTone').innerText   = d.labelTone;
-    document.getElementById('t_tonePro').innerText     = d.tonePro;
-    document.getElementById('t_toneFun').innerText     = d.toneFun;
-    document.getElementById('t_toneEdgy').innerText    = d.toneEdgy;
-    document.getElementById('t_btnExport').innerText   = d.btnExport;
-    document.getElementById('t_btnClear').innerText    = d.btnClear;
-    document.getElementById('t_loading').innerText     = d.loading;
-    document.getElementById('t_tabInput').innerText    = d.tabInput;
-    document.getElementById('t_tabOutput').innerText   = d.tabOutput;
+    document.getElementById('t_labelTone').innerText    = d.labelTone;
+    document.getElementById('t_tonePro').innerText      = d.tonePro;
+    document.getElementById('t_toneFun').innerText      = d.toneFun;
+    document.getElementById('t_toneEdgy').innerText     = d.toneEdgy;
+    document.getElementById('t_btnExport').innerText    = d.btnExport;
+    document.getElementById('t_btnClear').innerText     = d.btnClear;
+    document.getElementById('t_loading').innerText      = d.loading;
+    document.getElementById('t_tabInput').innerText     = d.tabInput;
+    document.getElementById('t_tabOutput').innerText    = d.tabOutput;
     document.getElementById('emptyStateText').innerText = d.emptyDefault;
 
-    // Re-render the current tool so labels update
     switchTool(currentTool, null);
 };
-
 // --- RENDERING FUNCTIONS ---
 export const renderHistoryList = () => {
     Array.from(resultsContainer.querySelectorAll('.result-card')).forEach(el => el.remove());
@@ -355,11 +356,16 @@ export const toggleTheme = () => {
 export const toggleMobileMenu = (forceClose = false) => {
     const sidebar = document.getElementById('sidebar');
     const overlay = document.getElementById('overlay');
-    if (forceClose || !sidebar.classList.contains('-translate-x-full')) {
-        sidebar.classList.add('-translate-x-full');
+    const isRtl = document.documentElement.dir === 'rtl';
+    const hiddenClass = isRtl ? 'translate-x-full' : '-translate-x-full';
+    const isHidden = sidebar.classList.contains('-translate-x-full') || sidebar.classList.contains('translate-x-full');
+
+    if (forceClose || !isHidden) {
+        sidebar.classList.remove('-translate-x-full', 'translate-x-full');
+        sidebar.classList.add(hiddenClass);
         overlay.classList.add('hidden');
     } else {
-        sidebar.classList.remove('-translate-x-full');
+        sidebar.classList.remove('-translate-x-full', 'translate-x-full');
         overlay.classList.remove('hidden');
     }
 };
