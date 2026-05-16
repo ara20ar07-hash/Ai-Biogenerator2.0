@@ -1,59 +1,104 @@
-// At the very top of js/ui.js
-import { dictionary, currentLang, setCurrentLang, currentTool } from './config.js';
+// js/config.js
 
-// ... other UI functions ...
+export let currentLang = 'en';
+export let currentTool = 'bio';
 
-export const toggleLanguage = () => {
-    // 1. Update the language state safely
-    const newLang = currentLang === 'en' ? 'ku' : 'en';
-    setCurrentLang(newLang);
-    
-    // 2. RTL Flip
-    document.documentElement.dir = newLang === 'ku' ? 'rtl' : 'ltr';
-    
-    // 3. Toggle Button Text
-    const langText = newLang === 'ku' ? 'English / EN' : 'کوردی / KU';
-    document.getElementById('desktopLangBtn').innerText = langText;
-    document.getElementById('mobileLangBtn').innerText = newLang === 'ku' ? 'EN' : 'KU';
+export const setCurrentLang = (lang) => { currentLang = lang; };
+export const setCurrentTool = (tool) => { currentTool = tool; };
 
-    // 4. Translate Static UI
-    const d = dictionary[newLang];
-    document.getElementById('t_setup').innerText = d.setup;
-    document.getElementById('t_navProfile').innerText = d.navProfile;
-    document.getElementById('t_tools').innerText = d.tools;
-    document.getElementById('t_navBio').innerText = d.navBio;
-    document.getElementById('t_navCaption').innerText = d.navCaption;
-    document.getElementById('t_navHook').innerText = d.navHook;
-    document.getElementById('t_navPlanner').innerText = d.navPlanner;
-    document.getElementById('t_navRoast').innerText = d.navRoast;
-    document.getElementById('t_account').innerText = d.account;
-    document.getElementById('t_navHistory').innerText = d.navHistory;
-    document.getElementById('t_navDark').innerText = d.navDark;
-    document.getElementById('t_btnSignOut').innerText = d.btnSignOut;
-    document.getElementById('t_btnSignIn').innerText = d.btnSignIn;
-    document.getElementById('t_syncText').innerText = d.syncText;
-    document.getElementById('t_labelPlatform').innerText = d.labelPlatform;
-    document.getElementById('t_labelTone').innerText = d.labelTone;
-    document.getElementById('t_tonePro').innerText = d.tonePro;
-    document.getElementById('t_toneFun').innerText = d.toneFun;
-    document.getElementById('t_toneEdgy').innerText = d.toneEdgy;
-    document.getElementById('t_btnExport').innerText = d.btnExport;
-    document.getElementById('t_btnClear').innerText = d.btnClear;
-    document.getElementById('t_loading').innerText = d.loading;
-    document.getElementById('t_tabInput').innerText = d.tabInput;
-    document.getElementById('t_tabOutput').innerText = d.tabOutput;
-    
-    // 5. Update Empty States based on history tab
-    if (currentTool === 'history') {
-        document.getElementById('rightSideTitle').innerText = d.titleHistory;
-        // Note: You will need to import currentUser from firebase.js later for this to work perfectly
-        // document.getElementById('emptyStateText').innerText = !currentUser ? d.emptyLogin : d.emptyHistory; 
-    } else {
-        document.getElementById('rightSideTitle').innerText = d.titleResults;
-        document.getElementById('emptyStateText').innerText = d.emptyDefault;
-    }
-
-    // 6. Refresh Dynamic UI
-    // Ensure switchTool is in ui.js or imported!
-    switchTool(currentTool, null); 
+export const dictionary = {
+  en: {
+    setup: 'Setup', tools: 'Tools', account: 'Account',
+    navProfile: 'Profile Context', navBio: 'Bio Generator',
+    navCaption: 'Viral Captions', navHook: 'Video Hooks',
+    navPlanner: '7-Day Planner', navRoast: 'Roast My Profile',
+    navHistory: 'My History', navDark: 'Dark Mode',
+    btnSignOut: 'Sign Out', btnSignIn: 'Sign in',
+    syncText: 'Sync history across devices',
+    labelPlatform: 'Platform', labelTone: 'Tone',
+    tonePro: 'Pro', toneFun: 'Fun', toneEdgy: 'Edgy',
+    btnExport: 'Export CSV', btnClear: 'Clear',
+    loading: 'Crafting AI magic...', tabInput: 'Fill In', tabOutput: 'Results',
+    titleResults: 'Results', titleHistory: 'My History',
+    emptyDefault: 'Select a tool, fill out the details, and let AI do the magic.',
+    emptyLogin: 'Please sign in to view your history.',
+    emptyHistory: 'No history yet. Generate something!',
+    toastCopy: 'Copied to clipboard!', errRetry: 'Try Again',
+    errServer: 'Server error. Please try again shortly.',
+    errNetwork: 'Network error. Check your connection.',
+    errParse: 'Could not read AI response. Please retry.',
+    errGeneric: 'Something went wrong. Please retry.',
+    lblOptional: 'optional',
+  },
+  ku: {
+    setup: 'ڕێکخستن', tools: 'ئامرازەکان', account: 'ئەکاونت',
+    navProfile: 'زانیاری پرۆفایل', navBio: 'دروستکردنی بایۆ',
+    navCaption: 'کاپشنی بەرفراوان', navHook: 'هوکی ڤیدیۆ',
+    navPlanner: 'پلانی ٧ ڕۆژ', navRoast: 'ئامۆژگاری پرۆفایل',
+    navHistory: 'مێژووی من', navDark: 'دۆخی تاریک',
+    btnSignOut: 'چوونەدەرەوە', btnSignIn: 'چوونەژوورەوە',
+    syncText: 'هاوکێشانی مێژوو لە ئامێرەکاندا',
+    labelPlatform: 'پلاتفۆرم', labelTone: 'شێواز',
+    tonePro: 'پیشەیی', toneFun: 'سەرگەرمی', toneEdgy: 'جێگیر',
+    btnExport: 'هەناردەکردن CSV', btnClear: 'پاككردنەوە',
+    loading: 'داتا ئامادەدەکرێت...', tabInput: 'پڕکردنەوە', tabOutput: 'ئەنجامەکان',
+    titleResults: 'ئەنجامەکان', titleHistory: 'مێژووی من',
+    emptyDefault: 'ئامرازێک هەڵبژێرە و زانیاریەکان پڕبکەرەوە.',
+    emptyLogin: 'تکایە بچۆ ژوورەوە بۆ بینینی مێژووت.',
+    emptyHistory: 'هێشتا مێژوو نییە. شتێک دروستبکە!',
+    toastCopy: 'کۆپی کرا!', errRetry: 'دووبارە هەوڵبدەرەوە',
+    errServer: 'هەڵەی سێرڤەر. تکایە دووبارە هەوڵبدەرەوە.',
+    errNetwork: 'هەڵەی تۆڕ. پەیوەندیت پشکنینەوە.',
+    errParse: 'وەڵامی AI نەتوانرا بخوێندرێتەوە.',
+    errGeneric: 'هەڵەیەک ڕوویدا. تکایە دووبارە هەوڵبدەرەوە.',
+    lblOptional: 'دیاریکراوی',
+  }
 };
+
+export const getToolsConfig = () => ({
+  profile: {
+    title: 'Profile Context', icon: 'fa-solid fa-user-cog text-green-500',
+    desc: 'Save your profile link or bio to personalize all tools.',
+    placeholder: 'Paste your Instagram/TikTok link or describe yourself...',
+    inputLabel: 'Your profile link or bio', showOptions: false, optionalWithContext: false,
+  },
+  bio: {
+    title: 'Bio Generator', icon: 'fa-regular fa-id-badge text-indigo-500',
+    desc: 'Generate the perfect social media bio in seconds.',
+    placeholder: 'e.g. Fitness coach, love pizza, helping moms get strong...',
+    inputLabel: 'Tell us about yourself', showOptions: true, optionalWithContext: true,
+    btnText: 'Generate Bios',
+  },
+  caption: {
+    title: 'Viral Captions', icon: 'fa-solid fa-pen-nib text-pink-500',
+    desc: 'Create scroll-stopping captions for your posts.',
+    placeholder: 'e.g. A photo of me at the gym, looking tired but happy...',
+    inputLabel: 'Describe your post', showOptions: true, optionalWithContext: true,
+    btnText: 'Generate Captions',
+  },
+  hook: {
+    title: 'Video Hooks', icon: 'fa-solid fa-magnet text-yellow-500',
+    desc: 'Generate 5 scroll-stopping opening hooks for your video.',
+    placeholder: 'e.g. How I lost 20kg in 3 months without going to the gym...',
+    inputLabel: 'What is your video about?', showOptions: false, optionalWithContext: true,
+    btnText: 'Generate Hooks',
+  },
+  planner: {
+    title: '7-Day Planner', icon: 'fa-solid fa-calendar-week text-blue-500',
+    desc: 'Get a full week of viral content ideas for your niche.',
+    placeholder: 'e.g. Personal finance for Gen Z, travel vlogs on a budget...',
+    inputLabel: 'Your niche or content topic', showOptions: true, optionalWithContext: true,
+    btnText: 'Generate Plan',
+  },
+  roast: {
+    title: 'Roast My Profile', icon: 'fa-solid fa-fire text-orange-500',
+    desc: 'Get a brutal honest roast + a professional rewrite.',
+    placeholder: 'Paste your current bio here...',
+    inputLabel: 'Your current bio', showOptions: false, optionalWithContext: false,
+    btnText: 'Roast Me 🔥',
+  },
+  history: {
+    title: 'My History', icon: 'fa-solid fa-clock-rotate-left text-gray-500',
+    desc: '', placeholder: '', inputLabel: '', showOptions: false,
+  },
+});
