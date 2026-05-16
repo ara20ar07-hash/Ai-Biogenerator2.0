@@ -1,5 +1,5 @@
 // js/ui.js
-import { dictionary, currentLang, currentTool, setCurrentTool, getToolsConfig } from './config.js';
+import { dictionary, currentLang, currentTool, setCurrentTool, setCurrentLang, getToolsConfig } from './config.js';
 import { currentUser, userProfileContext, userSocialAvatar, generationHistory } from './firebase.js';
 
 // --- UI DOM VARIABLES ---
@@ -29,7 +29,7 @@ export const showMobileTab = (tab) => {
         inputSection.classList.remove('mobile-active');
         outputBtn.className = 'flex items-center justify-center gap-2 py-3 text-sm font-semibold transition bg-purple-600 text-white';
         inputBtn.className  = 'flex items-center justify-center gap-2 py-3 text-sm font-semibold transition text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700/50';
-        badge.classList.add('hidden'); 
+        badge.classList.add('hidden');
     }
 };
 
@@ -43,7 +43,7 @@ export const notifyMobileResults = () => {
 
 export const updateDynamicToolUI = () => {
     const dynamicUI = document.getElementById('dynamicToolUI');
-    dynamicUI.innerHTML = ''; 
+    dynamicUI.innerHTML = '';
     const d = dictionary[currentLang];
     const config = getToolsConfig()[currentTool];
 
@@ -95,18 +95,21 @@ export const updateDynamicToolUI = () => {
     }
 };
 
+// --- SINGLE SWITCHTOOL DEFINITION (fixed) ---
 export const switchTool = (toolKey, event) => {
-    if(event) event.preventDefault();
-    setCurrentTool(toolKey); 
+    if (event) event.preventDefault();
+    setCurrentTool(toolKey);
     const config = getToolsConfig()[toolKey];
     const d = dictionary[currentLang];
+    const mobileTabBar = document.getElementById('mobileTabBar');
 
-    if(event) {
+    if (event) {
         document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
         event.currentTarget.classList.add('active');
     }
 
     if (toolKey === 'history') {
+        mobileTabBar.classList.add('hidden');
         if (window.innerWidth < 1024) {
             inputSection.classList.remove('mobile-active');
             outputSection.classList.add('mobile-active');
@@ -115,29 +118,30 @@ export const switchTool = (toolKey, event) => {
         }
         outputSection.classList.remove('lg:w-1/2');
         outputSection.classList.add('w-full');
-        
+
         document.getElementById('rightSideTitle').innerText = d.titleHistory;
         document.getElementById('clearBtn').classList.add('hidden');
-        document.getElementById('exportCsvBtn').classList.remove('hidden'); 
-        
+        document.getElementById('exportCsvBtn').classList.remove('hidden');
+
         renderHistoryList();
     } else {
+        mobileTabBar.classList.remove('hidden');
         if (window.innerWidth < 1024) showMobileTab('input');
         else inputSection.classList.remove('hidden');
-        
+
         outputSection.classList.add('lg:w-1/2');
         outputSection.classList.remove('w-full');
-        
+
         document.getElementById('toolTitleText').innerText = config.title;
         document.getElementById('toolDesc').innerText = config.desc;
         document.getElementById('toolIcon').className = config.icon;
         mainInput.placeholder = config.placeholder;
         document.getElementById('btnText').innerText = config.btnText || d.btnBio;
-        
+
         document.getElementById('rightSideTitle').innerText = d.titleResults;
         document.getElementById('clearBtn').classList.remove('hidden');
-        document.getElementById('exportCsvBtn').classList.add('hidden'); 
-        
+        document.getElementById('exportCsvBtn').classList.add('hidden');
+
         optionsSection.classList.toggle('hidden', !config.showOptions);
         clearResults();
 
@@ -146,15 +150,61 @@ export const switchTool = (toolKey, event) => {
         }
     }
 
-    updateDynamicToolUI(); 
-    toggleMobileMenu(true); 
+    updateDynamicToolUI();
+    toggleMobileMenu(true);
+};
+
+// --- LANGUAGE TOGGLE (was missing!) ---
+export const toggleLanguage = () => {
+    const newLang = currentLang === 'en' ? 'ku' : 'en';
+    setCurrentLang(newLang);
+
+    const d = dictionary[newLang];
+    const isKu = newLang === 'ku';
+
+    // Update button labels
+    document.getElementById('mobileLangBtn').innerText  = isKu ? 'EN' : 'KU';
+    document.getElementById('desktopLangBtn').innerText = isKu ? 'English / EN' : 'کوردی / KU';
+
+    // Update RTL direction
+    document.documentElement.dir = isKu ? 'rtl' : 'ltr';
+
+    // Update all translatable elements
+    document.getElementById('t_setup').innerText       = d.setup;
+    document.getElementById('t_tools').innerText       = d.tools;
+    document.getElementById('t_account').innerText     = d.account;
+    document.getElementById('t_navProfile').innerText  = d.navProfile;
+    document.getElementById('t_navBio').innerText      = d.navBio;
+    document.getElementById('t_navCaption').innerText  = d.navCaption;
+    document.getElementById('t_navHook').innerText     = d.navHook;
+    document.getElementById('t_navPlanner').innerText  = d.navPlanner;
+    document.getElementById('t_navRoast').innerText    = d.navRoast;
+    document.getElementById('t_navHistory').innerText  = d.navHistory;
+    document.getElementById('t_navDark').innerText     = d.navDark;
+    document.getElementById('t_btnSignIn').innerText   = d.btnSignIn;
+    document.getElementById('t_btnSignOut').innerText  = d.btnSignOut;
+    document.getElementById('t_syncText').innerText    = d.syncText;
+    document.getElementById('t_labelPlatform').innerText = d.labelPlatform;
+    document.getElementById('t_labelTone').innerText   = d.labelTone;
+    document.getElementById('t_tonePro').innerText     = d.tonePro;
+    document.getElementById('t_toneFun').innerText     = d.toneFun;
+    document.getElementById('t_toneEdgy').innerText    = d.toneEdgy;
+    document.getElementById('t_btnExport').innerText   = d.btnExport;
+    document.getElementById('t_btnClear').innerText    = d.btnClear;
+    document.getElementById('t_loading').innerText     = d.loading;
+    document.getElementById('t_tabInput').innerText    = d.tabInput;
+    document.getElementById('t_tabOutput').innerText   = d.tabOutput;
+    document.getElementById('emptyStateText').innerText = d.emptyDefault;
+
+    // Re-render the current tool so labels update
+    switchTool(currentTool, null);
 };
 
 // --- RENDERING FUNCTIONS ---
 export const renderHistoryList = () => {
     Array.from(resultsContainer.querySelectorAll('.result-card')).forEach(el => el.remove());
     const d = dictionary[currentLang];
-    
+
     if (!currentUser) {
         emptyState.classList.remove('hidden');
         emptyStateText.innerText = d.emptyLogin;
@@ -173,8 +223,8 @@ export const renderHistoryList = () => {
         const date = new Date(item.timestamp).toLocaleDateString();
         const card = document.createElement('div');
         card.className = "result-card bg-white dark:bg-gray-800 p-5 rounded-xl border border-gray-100 dark:border-gray-700 shadow-sm relative mb-4";
-        
-        let resultsHtml = item.results.map(res => 
+
+        let resultsHtml = item.results.map(res =>
             `<div class="bg-gray-50 dark:bg-gray-700/50 p-3 rounded-lg text-sm text-gray-700 dark:text-gray-300 mb-2 relative group">
                 <p class="px-6 whitespace-pre-wrap">${res}</p>
                 <button onclick='window.copyToClipboard(${JSON.stringify(res).replace(/'/g, "&#39;")})' class="absolute top-2 right-2 rtl:left-2 rtl:right-auto text-gray-400 hover:text-purple-500 opacity-0 group-hover:opacity-100 transition"><i class="fa-regular fa-copy"></i></button>
@@ -187,9 +237,7 @@ export const renderHistoryList = () => {
                 <span class="text-xs text-gray-400">${date}</span>
             </div>
             <p class="text-sm font-medium text-gray-600 dark:text-gray-400 mb-3 border-s-2 border-gray-200 dark:border-gray-600 px-2">"${item.input}"</p>
-            <div class="space-y-2">
-                ${resultsHtml}
-            </div>
+            <div class="space-y-2">${resultsHtml}</div>
         `;
         resultsContainer.appendChild(card);
     });
@@ -202,10 +250,10 @@ export const renderErrorCard = (errKey, statusCode) => {
     card.className = 'result-card error-shake mb-4';
 
     const iconMap = {
-        errServer:  { icon: 'fa-server',       color: 'text-orange-500', bg: 'bg-orange-50 dark:bg-orange-900/20', border: 'border-orange-200 dark:border-orange-800/40' },
-        errNetwork: { icon: 'fa-wifi-slash',    color: 'text-red-500',    bg: 'bg-red-50 dark:bg-red-900/20',       border: 'border-red-200 dark:border-red-800/40' },
+        errServer:  { icon: 'fa-server',               color: 'text-orange-500', bg: 'bg-orange-50 dark:bg-orange-900/20', border: 'border-orange-200 dark:border-orange-800/40' },
+        errNetwork: { icon: 'fa-wifi-slash',            color: 'text-red-500',    bg: 'bg-red-50 dark:bg-red-900/20',       border: 'border-red-200 dark:border-red-800/40' },
         errParse:   { icon: 'fa-triangle-exclamation', color: 'text-yellow-500', bg: 'bg-yellow-50 dark:bg-yellow-900/20', border: 'border-yellow-200 dark:border-yellow-800/40' },
-        errGeneric: { icon: 'fa-circle-xmark', color: 'text-red-500',    bg: 'bg-red-50 dark:bg-red-900/20',       border: 'border-red-200 dark:border-red-800/40' }
+        errGeneric: { icon: 'fa-circle-xmark',         color: 'text-red-500',    bg: 'bg-red-50 dark:bg-red-900/20',       border: 'border-red-200 dark:border-red-800/40' }
     };
     const style = iconMap[errKey] || iconMap.errGeneric;
     const message = d[errKey] || d.errGeneric;
@@ -238,15 +286,15 @@ export const renderResults = (resultsArray) => {
     resultsArray.forEach((text, index) => {
         const card = document.createElement('div');
         card.className = "result-card bg-white dark:bg-gray-800 p-5 rounded-xl border border-gray-100 dark:border-gray-700 shadow-sm relative group mb-4";
-        
+
         let labelHtml = "";
         if (currentTool === 'roast') {
-            const labelText = index === 0 ? "🔥" : "✨";
+            const labelText  = index === 0 ? "🔥" : "✨";
             const labelColor = index === 0 ? "text-orange-500 bg-orange-50 dark:bg-orange-900/30" : "text-purple-600 bg-purple-50 dark:bg-purple-900/30";
             labelHtml = `<span class="inline-block px-2 py-1 rounded text-xs font-bold mb-2 ${labelColor}">${labelText}</span><br>`;
         }
 
-        const safeText = JSON.stringify(text).replace(/'/g, "&#39;").replace(/"/g, "&quot;");
+        const safeText  = JSON.stringify(text).replace(/'/g, "&#39;").replace(/"/g, "&quot;");
         const safeInput = JSON.stringify(currentInputText).replace(/'/g, "&#39;").replace(/"/g, "&quot;");
         const safeTitle = JSON.stringify(currentToolTitle).replace(/"/g, "&quot;");
 
@@ -276,7 +324,7 @@ export const renderResults = (resultsArray) => {
 export const clearResults = () => {
     Array.from(resultsContainer.querySelectorAll('.result-card')).forEach(el => el.remove());
     emptyState.classList.remove('hidden');
-    if(currentTool !== 'profile') mainInput.value = "";
+    if (currentTool !== 'profile') mainInput.value = "";
 };
 
 export const copyToClipboard = (text) => {
@@ -301,7 +349,7 @@ export const toggleTheme = () => {
     html.classList.toggle('dark');
     const isDark = html.classList.contains('dark');
     document.getElementById('desktopThemeIcon').className = `fa-solid ${isDark ? 'fa-sun text-yellow-400' : 'fa-moon'} w-5 text-center`;
-    document.getElementById('mobileThemeIcon').className = `fa-solid ${isDark ? 'fa-sun text-yellow-400' : 'fa-moon'}`;
+    document.getElementById('mobileThemeIcon').className  = `fa-solid ${isDark ? 'fa-sun text-yellow-400' : 'fa-moon'}`;
 };
 
 export const toggleMobileMenu = (forceClose = false) => {
@@ -314,62 +362,4 @@ export const toggleMobileMenu = (forceClose = false) => {
         sidebar.classList.remove('-translate-x-full');
         overlay.classList.remove('hidden');
     }
-};
-
-export const switchTool = (toolKey, event) => {
-    if (event) event.preventDefault();
-    setCurrentTool(toolKey);
-    const config = getToolsConfig()[toolKey];
-    const d = dictionary[currentLang];
-    const mobileTabBar = document.getElementById('mobileTabBar');  // ← ADD THIS
-
-    if (event) {
-        document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
-        event.currentTarget.classList.add('active');
-    }
-
-    if (toolKey === 'history') {
-        mobileTabBar.classList.add('hidden');    // ← hide tabs in history mode
-        if (window.innerWidth < 1024) {
-            inputSection.classList.remove('mobile-active');
-            outputSection.classList.add('mobile-active');
-        } else {
-            inputSection.classList.add('hidden');
-        }
-        outputSection.classList.remove('lg:w-1/2');
-        outputSection.classList.add('w-full');
-
-        document.getElementById('rightSideTitle').innerText = d.titleHistory;
-        document.getElementById('clearBtn').classList.add('hidden');
-        document.getElementById('exportCsvBtn').classList.remove('hidden');
-
-        renderHistoryList();
-    } else {
-        mobileTabBar.classList.remove('hidden');  // ← show tabs for all tools
-        if (window.innerWidth < 1024) showMobileTab('input');
-        else inputSection.classList.remove('hidden');
-
-        outputSection.classList.add('lg:w-1/2');
-        outputSection.classList.remove('w-full');
-
-        document.getElementById('toolTitleText').innerText = config.title;
-        document.getElementById('toolDesc').innerText = config.desc;
-        document.getElementById('toolIcon').className = config.icon;
-        mainInput.placeholder = config.placeholder;
-        document.getElementById('btnText').innerText = config.btnText || d.btnBio;
-
-        document.getElementById('rightSideTitle').innerText = d.titleResults;
-        document.getElementById('clearBtn').classList.remove('hidden');
-        document.getElementById('exportCsvBtn').classList.add('hidden');
-
-        optionsSection.classList.toggle('hidden', !config.showOptions);
-        clearResults();
-
-        if (toolKey === 'profile' && userProfileContext) {
-            mainInput.value = userProfileContext;
-        }
-    }
-
-    updateDynamicToolUI();
-    toggleMobileMenu(true);
 };
