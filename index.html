@@ -141,26 +141,23 @@
 
         <!-- ── Mobile Tab Bar ────────────────────────────────────── -->
         <!-- Shown only on < lg, hidden on desktop via CSS above     -->
-        <div id="mobileTabBar" class="hidden sticky top-16 z-20 mx-4 mt-3 mb-1 bg-white/80 dark:bg-gray-800/80 backdrop-blur-md rounded-2xl shadow-md border border-gray-100 dark:border-gray-700 overflow-hidden">
-            <div class="grid grid-cols-2">
-                <button id="tabInputBtn"
-                        onclick="showMobileTab('input')"
-                        class="flex items-center justify-center gap-2 py-3 text-sm font-semibold transition
-                               bg-purple-600 text-white">
-                    <i class="fa-solid fa-pen-to-square"></i>
-                    <span id="t_tabInput">Fill In</span>
-                </button>
-                <button id="tabOutputBtn"
-                        onclick="showMobileTab('output')"
-                        class="flex items-center justify-center gap-2 py-3 text-sm font-semibold transition
-                               text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700/50">
-                    <i class="fa-solid fa-sparkles"></i>
-                    <span id="t_tabOutput">Results</span>
-                    <!-- Badge that lights up when new results arrive -->
-                    <span id="resultsBadge" class="hidden w-2 h-2 rounded-full bg-green-400 animate-pulse"></span>
-                </button>
-            </div>
-        </div>
+       <div id="mobileTabBar" class="hidden sticky top-16 z-20 bg-white/95 dark:bg-gray-900/95 backdrop-blur-md border-b border-gray-200 dark:border-gray-700 shadow-sm">
+    <div class="grid grid-cols-2">
+        <button id="tabInputBtn"
+                onclick="showMobileTab('input')"
+                class="flex items-center justify-center gap-2 py-3.5 text-sm font-semibold transition border-b-2 border-purple-600 text-purple-600 dark:text-purple-400 bg-transparent">
+            <i class="fa-solid fa-pen-to-square"></i>
+            <span id="t_tabInput">Fill In</span>
+        </button>
+        <button id="tabOutputBtn"
+                onclick="showMobileTab('output')"
+                class="flex items-center justify-center gap-2 py-3.5 text-sm font-semibold transition border-b-2 border-transparent text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300">
+            <i class="fa-solid fa-sparkles"></i>
+            <span id="t_tabOutput">Results</span>
+            <span id="resultsBadge" class="hidden w-2 h-2 rounded-full bg-green-400 animate-pulse"></span>
+        </button>
+    </div>
+</div>
         <!-- ──────────────────────────────────────────────────────── -->
 
         <div class="flex-1 overflow-y-auto p-4 md:p-8">
