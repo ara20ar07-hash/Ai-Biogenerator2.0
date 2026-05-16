@@ -1,6 +1,5 @@
 // js/ui.js
 
-import { dictionary, currentLang, currentTool, setCurrentTool, getToolsConfig } from './config.js';
 import { currentUser, userProfileContext, userSocialAvatar, generationHistory } from './firebase.js';
 
 // --- UI DOM VARIABLES ---
