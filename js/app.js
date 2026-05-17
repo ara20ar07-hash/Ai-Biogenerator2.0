@@ -41,3 +41,10 @@ UI.mainInput.addEventListener('keydown', (e) => {
 
 // 3. Initialize
 UI.switchTool('bio', null);
+
+// Deep link: check URL hash and switch to that tool
+const hash = window.location.hash.replace('#', '');
+const validTools = ['bio', 'caption', 'hook', 'planner', 'roast', 'profile'];
+if (hash && validTools.includes(hash)) {
+    UI.switchTool(hash, null);
+}
