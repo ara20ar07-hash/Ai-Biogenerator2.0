@@ -702,18 +702,11 @@
       .compare-table th, .compare-table td { padding: 14px 16px; font-size: 0.82rem; }
     }
 
-    .tool-link {
-  display: inline-flex;
-  align-items: center;
-  margin-top: 16px;
-  font-size: 0.82rem;
-  font-weight: 700;
-  color: var(--purple-light);
+   a.tool-card {
   text-decoration: none;
-  gap: 4px;
-  transition: gap 0.2s;
+  color: inherit;
+  cursor: pointer;
 }
-.tool-link:hover { gap: 8px; }
     
   </style>
 </head>
@@ -807,54 +800,53 @@
       <p class="section-sub">No fluff. Five focused AI tools that cover every content creation need — from first impression to weekly strategy.</p>
     </div>
 
-    <div class="tools-grid">
-      <div class="tool-card tool-card-1 reveal">
-        <div class="tool-icon" style="background:rgba(124,92,252,0.15)">🪪</div>
-        <h3>Bio Generator</h3>
-        <p>Generate 3 unique, platform-optimized bios in any tone — Professional, Fun, or Edgy — tailored to your personality.</p>
-        <span class="tool-tag" style="background:rgba(124,92,252,0.12);color:var(--purple-light)">Instagram · TikTok · LinkedIn</span>
-        <a href="app.html#bio" class="tool-link">Try it →</a>
-      </div>
+  <!-- Bio Generator -->
+<a href="app.html#bio" class="tool-card tool-card-1 reveal">
+  <div class="tool-icon" style="background:rgba(124,92,252,0.15)">🪪</div>
+  <h3>Bio Generator</h3>
+  <p>Generate 3 unique, platform-optimized bios in any tone — Professional, Fun, or Edgy — tailored to your personality.</p>
+  <span class="tool-tag" style="background:rgba(124,92,252,0.12);color:var(--purple-light)">Instagram · TikTok · LinkedIn</span>
+</a>
 
-      <div class="tool-card tool-card-2 reveal">
-        <div class="tool-icon" style="background:rgba(240,95,201,0.15)">✍️</div>
-        <h3>Viral Captions</h3>
-        <p>Stop the scroll with AI-crafted captions. Get hooks, emojis, and hashtags that drive real engagement on every post.</p>
-        <span class="tool-tag" style="background:rgba(240,95,201,0.12);color:var(--pink)">3 Captions · Any Platform</span>
-        <a href="app.html#caption" class="tool-link">Try it →</a>
-      </div>
+<!-- Viral Captions -->
+<a href="app.html#caption" class="tool-card tool-card-2 reveal">
+  <div class="tool-icon" style="background:rgba(240,95,201,0.15)">✍️</div>
+  <h3>Viral Captions</h3>
+  <p>Stop the scroll with AI-crafted captions. Get hooks, emojis, and hashtags that drive real engagement on every post.</p>
+  <span class="tool-tag" style="background:rgba(240,95,201,0.12);color:var(--pink)">3 Captions · Any Platform</span>
+</a>
 
-      <div class="tool-card tool-card-3 reveal">
-        <div class="tool-icon" style="background:rgba(247,201,72,0.15)">🧲</div>
-        <h3>Video Hooks</h3>
-        <p>Get 5 scroll-stopping opening lines for any video topic. Keep viewers hooked in the first 3 seconds — or they're gone.</p>
-        <span class="tool-tag" style="background:rgba(247,201,72,0.12);color:var(--gold)">TikTok · YouTube · Reels</span>
-        <a href="app.html#hook" class="tool-link">Try it →</a>
-      </div>
+<!-- Video Hooks -->
+<a href="app.html#hook" class="tool-card tool-card-3 reveal">
+  <div class="tool-icon" style="background:rgba(247,201,72,0.15)">🧲</div>
+  <h3>Video Hooks</h3>
+  <p>Get 5 scroll-stopping opening lines for any video topic. Keep viewers hooked in the first 3 seconds — or they're gone.</p>
+  <span class="tool-tag" style="background:rgba(247,201,72,0.12);color:var(--gold)">TikTok · YouTube · Reels</span>
+</a>
 
-      <div class="tool-card tool-card-4 reveal">
-        <div class="tool-icon" style="background:rgba(69,224,209,0.15)">📅</div>
-        <h3>7-Day Content Planner</h3>
-        <p>Generate a full week of viral content ideas for your niche — each with a title, hook, and concept ready to film.</p>
-        <span class="tool-tag" style="background:rgba(69,224,209,0.12);color:var(--cyan)">Full Week · Any Niche</span>
-        <a href="app.html#planner" class="tool-link">Try it →</a>
-      </div>
+<!-- 7-Day Planner -->
+<a href="app.html#planner" class="tool-card tool-card-4 reveal">
+  <div class="tool-icon" style="background:rgba(69,224,209,0.15)">📅</div>
+  <h3>7-Day Content Planner</h3>
+  <p>Generate a full week of viral content ideas for your niche — each with a title, hook, and concept ready to film.</p>
+  <span class="tool-tag" style="background:rgba(69,224,209,0.12);color:var(--cyan)">Full Week · Any Niche</span>
+</a>
 
-      <div class="tool-card tool-card-5 reveal">
-        <div class="tool-icon" style="background:rgba(240,95,201,0.15)">🔥</div>
-        <h3>Roast My Profile</h3>
-        <p>Paste your current bio and get a brutally honest roast PLUS a polished professional rewrite. Zero sugarcoating.</p>
-        <span class="tool-tag" style="background:rgba(240,95,201,0.12);color:var(--pink)">Roast + Rewrite</span>
-        <a href="app.html#roast" class="tool-link">Try it →</a>
-      </div>
+<!-- Roast My Profile -->
+<a href="app.html#roast" class="tool-card tool-card-5 reveal">
+  <div class="tool-icon" style="background:rgba(240,95,201,0.15)">🔥</div>
+  <h3>Roast My Profile</h3>
+  <p>Paste your current bio and get a brutally honest roast PLUS a polished professional rewrite. Zero sugarcoating.</p>
+  <span class="tool-tag" style="background:rgba(240,95,201,0.12);color:var(--pink)">Roast + Rewrite</span>
+</a>
 
-      <div class="tool-card reveal" style="background: linear-gradient(135deg,rgba(124,92,252,0.1),rgba(240,95,201,0.06)); border-color: rgba(124,92,252,0.25);">
-        <div class="tool-icon" style="background:rgba(124,92,252,0.2)">⚡</div>
-        <h3>Profile Context</h3>
-        <p>Save your profile once, and every tool you use becomes deeply personalized to your niche, voice, and audience.</p>
-        <span class="tool-tag" style="background:rgba(124,92,252,0.12);color:var(--purple-light)">Personalization Engine</span>
-        <a href="app.html#profile" class="tool-link">Try it →</a>
-      </div>
+<!-- Profile Context -->
+<a href="app.html#profile" class="tool-card reveal" style="background:linear-gradient(135deg,rgba(124,92,252,0.1),rgba(240,95,201,0.06));border-color:rgba(124,92,252,0.25);">
+  <div class="tool-icon" style="background:rgba(124,92,252,0.2)">⚡</div>
+  <h3>Profile Context</h3>
+  <p>Save your profile once, and every tool you use becomes deeply personalized to your niche, voice, and audience.</p>
+  <span class="tool-tag" style="background:rgba(124,92,252,0.12);color:var(--purple-light)">Personalization Engine</span>
+</a>
     </div>
   </div>
 </section>
