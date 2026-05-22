@@ -159,6 +159,13 @@ export const runAdviceAnalysis = async ({
       if (!response.ok) throw new Error(`HTTP ${response.status}`);
 
       const data = await response.json();
+
+      if (response.ok) {
+          // Update this line to use data.text (matching our new clean server output above)
+          renderOutputCard(data.text); 
+      } else {
+          showToast(data.error || "Generation failed.");
+      }
       const rawText = data.candidates?.[0]?.content?.parts?.[0]?.text;
 
       if (!rawText) throw new Error('Empty response');
