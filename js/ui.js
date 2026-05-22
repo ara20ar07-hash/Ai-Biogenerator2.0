@@ -1,4 +1,7 @@
 // js/ui.js
+// Add to the existing imports block at top of ui.js
+import { runAdviceAnalysis } from './advice.js';
+import { renderAdviceReport } from './advice-ui.js';
 import { dictionary, currentLang, currentTool, setCurrentTool, setCurrentLang, getToolsConfig } from './config.js';
 import { currentUser, userProfileContext, userSocialAvatar, generationHistory } from './firebase.js';
 
