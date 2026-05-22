@@ -139,7 +139,6 @@ export const runAdviceAnalysis = async ({
     },
   };
 
-  // Use the advice endpoint (or fall back to main generate endpoint)
   const endpoint = window.location.hostname.includes('netlify.app') ||
     window.location.hostname.includes('vercel.app')
     ? '/api/advice'
@@ -156,29 +155,29 @@ export const runAdviceAnalysis = async ({
         body: JSON.stringify(payload),
       });
 
-      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      if (!response.ok) {
+        const errData = await response.json().catch(() => ({}));
+        throw new Error(errData.error || `HTTP ${response.status}`);
+      }
 
       const data = await response.json();
 
-      if (response.ok) {
-          // Update this line to use data.text (matching our new clean server output above)
-          renderOutputCard(data.text); 
-      } else {
-          showToast(data.error || "Generation failed.");
-      }
-      const rawText = data.candidates?.[0]?.content?.parts?.[0]?.text;
+      // Extract the raw text safely from our clean Groq server output
+      const rawText = data.text;
 
-      if (!rawText) throw new Error('Empty response');
+      if (!rawText) throw new Error('Empty response from AI engine');
 
-      // Strip any accidental markdown fences
+      // Strip any accidental markdown blocks and parse the JSON report string
       const clean = rawText.replace(/```json|```/g, '').trim();
       const report = JSON.parse(clean);
 
+      // Pass the fully parsed JSON object to your UI component
       onResult?.(report);
-      return;
+      return; 
     } catch (err) {
       if (attempt === 3) {
         console.error('Advice analysis failed:', err);
+        showToast(err.message || "Generation failed.");
         onError?.(err);
         return;
       }
