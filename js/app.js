@@ -5,7 +5,7 @@ import { generateContent } from './api.js';
 import { saveSingleResult, signInWithGoogle, handleSignOut, exportHistoryCSV } from './firebase.js';
 import { runAdviceAnalysis } from './advice.js';
 import { renderAdviceReport } from './advice-ui.js';
-import { currentTool } from './config.js';
+import { getcurrentTool } from './config.js';
 
 // 1. Attach functions to window so onclick="..." in HTML can reach them
 window.switchTool       = UI.switchTool;
