@@ -3,6 +3,7 @@
 export let currentLang = 'en';
 export let currentTool = 'bio';
 
+export const getCurrentTool = () => currentTool;
 export const setCurrentLang = (lang) => { currentLang = lang; };
 export const setCurrentTool = (tool) => { currentTool = tool; };
 
