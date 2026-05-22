@@ -149,32 +149,43 @@ export const runAdviceAnalysis = async ({
 
   while (attempt <= 3) {
     try {
+      console.log("[v0] Advice: Sending request to", endpoint, "attempt", attempt + 1);
       const response = await fetch(endpoint, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
       });
 
+      console.log("[v0] Advice: Response status", response.status);
+
       if (!response.ok) {
         const errData = await response.json().catch(() => ({}));
+        console.log("[v0] Advice: Error data", errData);
         throw new Error(errData.error || `HTTP ${response.status}`);
       }
 
       const data = await response.json();
+      console.log("[v0] Advice: Raw response data", data);
 
       // Extract the raw text safely from our clean Groq server output
       const rawText = data.text;
 
-      if (!rawText) throw new Error('Empty response from AI engine');
+      if (!rawText) {
+        console.log("[v0] Advice: Empty rawText, full data:", JSON.stringify(data));
+        throw new Error('Empty response from AI engine');
+      }
 
       // Strip any accidental markdown blocks and parse the JSON report string
       const clean = rawText.replace(/```json|```/g, '').trim();
+      console.log("[v0] Advice: Cleaned text length", clean.length);
       const report = JSON.parse(clean);
+      console.log("[v0] Advice: Parsed report successfully");
 
       // Pass the fully parsed JSON object to your UI component
       onResult?.(report);
       return; 
     } catch (err) {
+      console.log("[v0] Advice: Caught error", err.message, "attempt", attempt);
       if (attempt === 3) {
         console.error('Advice analysis failed:', err);
         showToast(err.message || "Generation failed.");
