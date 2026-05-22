@@ -1,13 +1,16 @@
-// api/advice.js (or whatever your serverless filename is)
+// api/advice.js
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).end();
 
-  // 1. Get the prompt/context details passed from your advice.js frontend
-  const { prompt, userPersonaContext } = req.body; 
-
   try {
-    // 2. Call the Groq API endpoint
+    const incomingPayload = req.body;
+    
+    // Extract data from your frontend payload format
+    const userPromptText = incomingPayload.contents?.[0]?.parts?.[0]?.text || "Run the full growth audit.";
+    const systemPromptText = incomingPayload.systemInstruction?.parts?.[0]?.text || "You are an expert strategist.";
+
+    // Call the Groq API endpoint
     const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
       method: "POST",
       headers: {
@@ -15,39 +18,42 @@ export default async function handler(req, res) {
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        // llama3-70b is highly advanced and handles hard/complex requests flawlessly
-        model: "llama3-70b-8192", 
+        // Using Llama 3.1 70b which supports rigid JSON validation modes perfectly
+        model: "llama-3.1-70b-versatile", 
         messages: [
           {
             role: "system",
-            content: `You are an expert social media strategist and AI creator coach. Core user profile context: ${userPersonaContext || 'None provided'}. Always output highly accurate, formatted, and impactful advice.`
+            content: systemPromptText
           },
           {
             role: "user",
-            content: prompt
+            content: userPromptText
           }
         ],
-        temperature: 0.7
+        temperature: 0.4,
+        // CRITICAL FOR GROQ: This forces the model to respect your JSON structure
+        response_format: { type: "json_object" } 
       })
     });
 
-    // 3. Catch structural or service issues before they break the app
     if (!response.ok) {
-      const errorData = await response.json();
-      console.error("Groq Error Log:", errorData);
-      return res.status(response.status).json({ error: "AI Engine is busy. Try again!" });
+      const errorData = await response.json().catch(() => ({}));
+      console.error("Groq Engine Error Rejection:", errorData);
+      
+      // Let's pass the exact error text back to make debugging easier if it drops
+      return res.status(response.status).json({ 
+        error: errorData.error?.message || "Groq API was unable to process request." 
+      });
     }
 
     const data = await response.json();
-    
-    // 4. Extract the generated text message safely
     const aiTextOutput = data.choices[0].message.content;
 
-    // 5. Return the clean text back to your frontend
+    // Send it clean back to advice.js frontend
     return res.status(200).json({ text: aiTextOutput });
 
   } catch (error) {
-    console.error("Serverless Crash:", error);
+    console.error("Serverless Function Crashed:", error);
     return res.status(500).json({ error: "Internal Server Error" });
   }
 }
