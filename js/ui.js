@@ -146,6 +146,8 @@ export const switchTool = (toolKey, event) => {
         document.getElementById('exportCsvBtn').classList.add('hidden');
 
         optionsSection.classList.toggle('hidden', !config.showOptions);
+        const adviceExtras = document.getElementById('adviceExtras');
+        if (adviceExtras) adviceExtras.classList.toggle('hidden', toolKey !== 'advice');
         clearResults();
 
         if (toolKey === 'profile' && userProfileContext) {
