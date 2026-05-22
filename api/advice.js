@@ -18,8 +18,8 @@ export default async function handler(req, res) {
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        // Updated to Groq's active flagship Llama 3.3 70B model
-        model: "llama-3.3-70b-specdec", 
+        // Updated to Groq's current supported Llama 3.3 70B model
+        model: "llama-3.3-70b-versatile", 
         messages: [
           {
             role: "system",
