@@ -13,6 +13,8 @@ export const dictionary = {
     navCaption: 'Viral Captions', navHook: 'Video Hooks',
     navPlanner: '7-Day Planner', navRoast: 'Roast My Profile',
     navHistory: 'My History', navDark: 'Dark Mode',
+    navAdvice: 'Growth Advisor',
+    btnAnalyze: 'Analyze My Profile',
     btnSignOut: 'Sign Out', btnSignIn: 'Sign in',
     syncText: 'Sync history across devices',
     labelPlatform: 'Platform', labelTone: 'Tone',
@@ -36,6 +38,8 @@ export const dictionary = {
     navCaption: 'کاپشنی بەرفراوان', navHook: 'هوکی ڤیدیۆ',
     navPlanner: 'پلانی ٧ ڕۆژ', navRoast: 'ئامۆژگاری پرۆفایل',
     navHistory: 'مێژووی من', navDark: 'دۆخی تاریک',
+    navAdvice: 'ڕێنمایی گەشەسەندن',
+    btnAnalyze: 'شیکاری پرۆفایلم',
     btnSignOut: 'چوونەدەرەوە', btnSignIn: 'چوونەژوورەوە',
     syncText: 'هاوکێشانی مێژوو لە ئامێرەکاندا',
     labelPlatform: 'پلاتفۆرم', labelTone: 'شێواز',
@@ -100,5 +104,15 @@ export const getToolsConfig = () => ({
   history: {
     title: 'My History', icon: 'fa-solid fa-clock-rotate-left text-gray-500',
     desc: '', placeholder: '', inputLabel: '', showOptions: false,
+  },
+  advice: {
+  title: 'Growth Advisor',
+  icon: 'fa-solid fa-chart-line text-emerald-500',
+  desc: 'AI analysis of your profile vs. similar creators. Get a prioritized action plan.',
+  placeholder: 'Paste your bio, recent captions, or Instagram/TikTok URL…',
+  inputLabel: 'Your profile & recent content',
+  showOptions: false,
+  optionalWithContext: true,
+  btnText: 'Analyze My Profile',
   },
 });
