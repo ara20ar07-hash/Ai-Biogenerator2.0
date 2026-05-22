@@ -18,8 +18,8 @@ export default async function handler(req, res) {
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        // Using Llama 3.1 70b which supports rigid JSON validation modes perfectly
-        model: "llama-3.1-70b-versatile", 
+        // Updated to Groq's active flagship Llama 3.3 70B model
+        model: "llama-3.3-70b-specdec", 
         messages: [
           {
             role: "system",
@@ -31,7 +31,7 @@ export default async function handler(req, res) {
           }
         ],
         temperature: 0.4,
-        // CRITICAL FOR GROQ: This forces the model to respect your JSON structure
+        // Forces the model to output the clean JSON object your frontend needs
         response_format: { type: "json_object" } 
       })
     });
@@ -40,7 +40,6 @@ export default async function handler(req, res) {
       const errorData = await response.json().catch(() => ({}));
       console.error("Groq Engine Error Rejection:", errorData);
       
-      // Let's pass the exact error text back to make debugging easier if it drops
       return res.status(response.status).json({ 
         error: errorData.error?.message || "Groq API was unable to process request." 
       });
@@ -49,7 +48,7 @@ export default async function handler(req, res) {
     const data = await response.json();
     const aiTextOutput = data.choices[0].message.content;
 
-    // Send it clean back to advice.js frontend
+    // Send it clean back to your advice.js frontend
     return res.status(200).json({ text: aiTextOutput });
 
   } catch (error) {
