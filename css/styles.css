@@ -90,3 +90,21 @@
 .error-shake {
     animation: shake 0.55s ease-in-out;
 }
+/* ── Advice UI semantic tokens ───────────────────────────────
+   Maps light/dark colours for the advice-ui.js report cards.
+   ----------------------------------------------------------- */
+:root {
+    --color-text-primary:        #111827;   /* gray-900  */
+    --color-text-secondary:      #6b7280;   /* gray-500  */
+    --color-background-secondary:#f9fafb;   /* gray-50   */
+    --color-border-primary:      #e5e7eb;   /* gray-200  */
+    --color-border-tertiary:     #f3f4f6;   /* gray-100  */
+}
+
+.dark {
+    --color-text-primary:        #f9fafb;   /* gray-50   */
+    --color-text-secondary:      #9ca3af;   /* gray-400  */
+    --color-background-secondary:#1f2937;   /* gray-800  */
+    --color-border-primary:      #374151;   /* gray-700  */
+    --color-border-tertiary:     #374151;   /* gray-700  */
+}
