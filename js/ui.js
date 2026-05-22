@@ -185,6 +185,7 @@ if (window.innerWidth < 768) {
     document.getElementById('t_navHook').innerText      = d.navHook;
     document.getElementById('t_navPlanner').innerText   = d.navPlanner;
     document.getElementById('t_navRoast').innerText     = d.navRoast;
+    document.getElementById('t_navAdvice').innerText = d.navAdvice;
     document.getElementById('t_navHistory').innerText   = d.navHistory;
     document.getElementById('t_navDark').innerText      = d.navDark;
     document.getElementById('t_btnSignIn').innerText    = d.btnSignIn;
