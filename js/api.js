@@ -20,6 +20,9 @@ export const generateContent = async () => {
     const tone = document.querySelector('input[name="tone"]:checked').value;
     const config = getToolsConfig()[currentTool];
 
+    // Guard: advice tool has its own dedicated runner — never handled here
+    if (currentTool === 'advice') return;
+
     if (currentTool === 'profile') {
         if (!inputText) {
             showToast("Please enter your profile link or bio first!");
