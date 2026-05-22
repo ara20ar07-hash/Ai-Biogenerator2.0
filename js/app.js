@@ -23,7 +23,7 @@ window.exportHistoryCSV = exportHistoryCSV;
 
 // 2. Single handler that decides which generator to run
 function handleGenerate() {
-    if (getcurrentTool() === 'advice') {
+    if (getCurrentTool() === 'advice') {
         // --- Advice tool path ---
         const profileText = UI.mainInput.value.trim();
         const comparators = document.getElementById('adviceComparators')?.value || '';
