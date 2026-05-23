@@ -38,22 +38,37 @@ try {
     auth = getAuth(app);
     db = getFirestore(app);
 
-    const initAuth = async () => {
-        try {
-            if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                await signInWithCustomToken(auth, __initial_auth_token);
-            } else {
-                await signInAnonymously(auth);
+   const initAuth = async () => {
+    // Wait for Firebase to restore any existing session first
+    return new Promise((resolve) => {
+        const unsubscribe = onAuthStateChanged(auth, async (user) => {
+            unsubscribe(); // only fire once
+
+            // ✅ A user is already signed in (Google or anonymous) — do nothing
+            if (user) {
+                resolve(user);
+                return;
             }
-        } catch (error) {
+
+            // No existing session — now handle token or fall back to anonymous
             try {
-                await signInAnonymously(auth);
-            } catch (anonErr) {
-                console.log("Anonymous auth disabled. User must sign in manually.");
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    await signInWithCustomToken(auth, __initial_auth_token);
+                } else {
+                    await signInAnonymously(auth);
+                }
+            } catch (error) {
+                try {
+                    await signInAnonymously(auth);
+                } catch (anonErr) {
+                    console.log("Anonymous auth disabled. User must sign in manually.");
+                }
             }
-        }
-    };
-    initAuth();
+            resolve(null);
+        });
+    });
+};
+initAuth();
 
     onAuthStateChanged(auth, (user) => {
         currentUser = user;
